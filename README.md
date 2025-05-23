@@ -1,0 +1,2 @@
+# CaptainLog
+Traveller Captain Log
