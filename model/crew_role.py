@@ -17,5 +17,5 @@ class CrewRole(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(String(4))
     name: Mapped[str] = mapped_column(String(100))
-    descrition: Mapped[str] = mapped_column(String(1000))
+    description: Mapped[str] = mapped_column(String(1000))
     crew: Mapped[List["Crew"]] = relationship(back_populates="role")
