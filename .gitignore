@@ -1,3 +1,9 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
+
+# Database
+captain_log.db
+
+# Alembic db revision files
 alembic/versions
