@@ -5,7 +5,7 @@ from model import CrewRole
 class Action():
     
     @staticmethod
-    def create_role():
+    def create_role(name: str = "Captain", code: str = "CAP", description: str = "Spaceship captain"):
         engine = create_engine("sqlite:///captain_log.db", echo=True)
 
         with Session(engine) as session:

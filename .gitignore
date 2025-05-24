@@ -2,8 +2,12 @@
 __pycache__/
 *.pyc
 
+# Virtual environment
+Pipfile
+Pipfile.lock
+
 # Database
-captain_log.db
+*.db
 
 # Alembic db revision files
 alembic/versions

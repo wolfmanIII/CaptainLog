@@ -11,11 +11,10 @@ from model.base import Base
 if TYPE_CHECKING:
     from model import Crew
 
-class CrewRole(Base):
-    __tablename__ = "crew_role"
+class ShipRole(Base):
+    __tablename__ = "ship_role"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(String(4))
     name: Mapped[str] = mapped_column(String(100))
     description: Mapped[str] = mapped_column(String(1000))
-    crew: Mapped[List["Crew"]] = relationship(back_populates="role")
