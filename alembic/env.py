@@ -6,7 +6,6 @@ from sqlalchemy import pool
 from alembic import context
 
 from model import Base
-from model import ship, crew, crew_role, annual_budget, ship_mortgage
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

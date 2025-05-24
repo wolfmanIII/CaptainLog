@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 python-dotenv = "*"
 sqlalchemy = "*"
-wxpython = "*"
 alembic = "*"
+sv-ttk = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.11"
+python_version = "3.13"
