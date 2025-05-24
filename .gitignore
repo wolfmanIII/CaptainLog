@@ -1,4 +1,3 @@
 __pycache__/
 *.pyc
-./captain_log.db
 alembic/versions
