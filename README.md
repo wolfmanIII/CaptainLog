@@ -10,7 +10,7 @@ Traveller Captain Log
 [pip install SQLAlchemy](https://pypi.org/project/SQLAlchemy/)
 
 ### alembic - optional
-[python-dotenv](https://pypi.org/project/alembic/)
+[pip install alembic](https://pypi.org/project/alembic/)
 
 ### sv-ttk
 [pip install sv-ttk](https://pypi.org/project/sv-ttk/)
