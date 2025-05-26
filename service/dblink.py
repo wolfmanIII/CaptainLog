@@ -6,6 +6,9 @@ class DBLink:
     def __init__(self, echo: bool = False):
         self.engine = create_engine("sqlite:///captain_log.db", echo=echo)
 
+    def getSession(self):
+        return Session(self.engine)
+    
     def close(self):
         Session(self.engine).close()
         
@@ -14,6 +17,3 @@ class DBLink:
         
     def drop_db(self):
         Base.metadata.drop_all(self.engine)
-
-    def getSession(self):
-        return Session(self.engine)

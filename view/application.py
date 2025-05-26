@@ -1,35 +1,38 @@
 from os import name
-from sqlalchemy import select
+from sqlalchemy import column, select
 import tkinter
 from tkinter import ttk
 
 from model.ship_role import ShipRole
 from service.dblink import DBLink
+from view.ship_role_list import ShipRoleList
 
 
 class Application(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.grid(column=0, row=0, rowspan=2, columnspan=3)
+        self.grid(column=0, row=0, rowspan=2, columnspan=2)
         self.createWidgets()
 
     def createWidgets(self):
-
-        columns = ("code", "name", "description")
-        self.ship_roles = ttk.Treeview(self, columns=columns, show="headings")
-        
-        self.ship_roles.heading("code", text="Code")
-        self.ship_roles.heading("name", text="Name")
-        self.ship_roles.heading("description", text="Description")
-        session = DBLink().getSession()
-
-        stmt = select(ShipRole)
-        for role in session.scalars(stmt):
-            values = (role.code, role.name, role.description)
-            self.ship_roles.insert('', 'end', text='Listbox', values=values)
-
-
-        self.ship_roles.grid(column=0, row=0)
+        #self.ship_role_list = ShipRoleList(self)
+        #self.ship_role_list.buildView(column=0, row=0, columnspan=2, rowspan=1)
 
         self.quitButton = ttk.Button(self, text='Quit', command=self.quit)
         self.quitButton.grid(column=0, row=1)
+
+        self.shipRoleButton = ttk.Button(self, text='Ship roles', command=self.callShipRoleList)
+        self.shipRoleButton.grid(column=1, row=1)
+
+    def callShipRoleList(self):
+        dialog = tkinter.Toplevel(self)
+        dialog.title("Ship roles list")
+        dialog.grid()
+        dialog.ship_role_list = ShipRoleList(dialog)
+        dialog.ship_role_list.buildView(column=0, row=0, columnspan=2, rowspan=1)
+        dialog.quitButton = ttk.Button(dialog, text='Quit', command=dialog.destroy)
+        dialog.quitButton.grid(column=0, row=1)
+        dialog.grab_set() # Rende la finestra MODALE (blocca l'interazione con la principale finché non la chiudi)
+
+
+        
