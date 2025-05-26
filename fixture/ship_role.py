@@ -3,7 +3,7 @@ from model.base import Base
 from service.dblink import DBLink
 from model.ship_role import ShipRole
 
-def add_ship_role():
+def add_ship_roles():
     link = DBLink(echo=True)
 
     # Create ship roles in the database
@@ -23,7 +23,7 @@ def add_ship_role():
         session.add(ship_role)
         
         ship_role = ShipRole(
-            code="PLT",
+            code="PIL",
             name="Pilot",
             description="Spaceship pilot"
         )

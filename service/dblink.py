@@ -14,3 +14,6 @@ class DBLink:
         
     def drop_db(self):
         Base.metadata.drop_all(self.engine)
+
+    def getSession(self):
+        return Session(self.engine)

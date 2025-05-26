@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from model.base import Base
@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 
 class ShipRole(Base):
     __tablename__ = "ship_role"
+    __table_args__ = (
+        UniqueConstraint("code", name="uq_ship_role_code"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(String(4))
