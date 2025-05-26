@@ -17,7 +17,6 @@ class ShipRoleList():
 
 
     def buildView(self, column=0, row=0, columnspan=1, rowspan=1):
-        
         session = DBLink().getSession()
         stmt = select(ShipRole)
         for role in session.scalars(stmt):

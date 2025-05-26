@@ -20,19 +20,3 @@ class Application(ttk.Frame):
     def createWidgets(self):
         self.quitButton = ttk.Button(self, text='Quit', command=self.quit)
         self.quitButton.grid(column=0, row=1)
-
-        self.shipRoleButton = ttk.Button(self, text='Ship roles', command=self.callShipRoleList)
-        self.shipRoleButton.grid(column=1, row=1)
-
-    def callShipRoleList(self):
-        dialog = tkinter.Toplevel(self)
-        dialog.title("Ship roles list")
-        dialog.grid()
-        dialog.ship_role_list = ShipRoleList(dialog)
-        dialog.ship_role_list.buildView(column=0, row=0, columnspan=2, rowspan=1)
-        dialog.quitButton = ttk.Button(dialog, text='Quit', command=dialog.destroy)
-        dialog.quitButton.grid(column=0, row=1)
-        dialog.grab_set() # Rende la finestra MODALE (blocca l'interazione con la principale finché non la chiudi)
-
-
-        
