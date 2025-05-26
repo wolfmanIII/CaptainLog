@@ -4,13 +4,13 @@ Traveller Captain Log
 ## Dependecies
 
 ### python-dotenv
-[python-dotenv](https://pypi.org/project/dotenv-python/)
+[pip install python-dotenv](https://pypi.org/project/dotenv-python/)
 
 ### sqlalchemy
-[SQLAlchemy](https://pypi.org/project/SQLAlchemy/)
+[pip install SQLAlchemy](https://pypi.org/project/SQLAlchemy/)
 
 ### alembic - optional
-[Alembic](https://pypi.org/project/alembic/)
+[pip install Alembic](https://pypi.org/project/alembic/)
 
 ### sv-ttk
-[sv-ttk](https://pypi.org/project/sv-ttk/)
+[pip install sv-ttk](https://pypi.org/project/sv-ttk/)
