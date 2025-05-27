@@ -1,4 +1,3 @@
-from os import name
 from sqlalchemy import select
 import tkinter
 from tkinter import ttk

@@ -7,6 +7,7 @@ import tkinter.font as tkFont
 from model.ship import Ship
 from service.dblink import DBLink
 from service.ship_service import ShipService
+from view.ship_view import ShipView
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
@@ -35,7 +36,8 @@ class ShipListView(ttk.Frame):
 
         self.set_columns_dimension()
         
-        self.addShipButton = ttk.Button(self.parent, text="Add Ship", width=12)
+        self.ship_view = ShipView(self)
+        self.addShipButton = ttk.Button(self.parent, text="Add Ship", width=12, command=self.viewShip)
         self.addShipButton.grid(column=1, row=0, padx=5, pady=2)
 
         self.removeShipButton = ttk.Button(self.parent, text="Remove Ship", width=12)
@@ -64,5 +66,12 @@ class ShipListView(ttk.Frame):
             # Aggiungi un po' di margine
             max_width += 10
             self.ships.column(col, width=max_width)
+
+    def viewShip(self):
+        self.dialog = tkinter.Toplevel(self.parent)
+        self.dialog.title("Ship")
+        self.dialog.grid()
+        self.dialog.ship_list = ShipView(self.dialog)
+
 
         
