@@ -17,6 +17,7 @@ class Ship(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(String(36))
     name: Mapped[str] = mapped_column(String(100))
+    type: Mapped[str] = mapped_column(String(100))
     model: Mapped[str] = mapped_column(String(100))
     ship_price: Mapped[float] = mapped_column(Numeric(11, 2))
     ship_mortgage: Mapped["ShipMortgage"] = relationship(back_populates="ship")

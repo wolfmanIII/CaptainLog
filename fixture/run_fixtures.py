@@ -6,6 +6,7 @@ from service.dblink import DBLink
 from model.ship_role import ShipRole
 from sqlalchemy.orm import Session
 from fixture.ship_role import add_ship_roles
+from fixture.ship import add_ships
 import sys
 
 
@@ -16,6 +17,8 @@ def run(type):
             link.create_db()
         case "ship_role":
             add_ship_roles()
+        case "ship":
+            add_ships()
 
 type = sys.argv[1]
 run(type)

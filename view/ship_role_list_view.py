@@ -2,6 +2,7 @@ from os import name
 from sqlalchemy import select
 import tkinter
 from tkinter import ttk
+import tkinter.font as tkFont
 
 from model.ship_role import ShipRole
 from service.dblink import DBLink
@@ -23,11 +24,29 @@ class ShipRoleListView(ttk.Frame):
         
         self.show_data(ShipRoleService().get_all_ship_roles())
         self.ship_roles.grid(column=0, row=0, columnspan=2, rowspan=1)
-        self.quitButton = ttk.Button(self.parent, text='Quit', command=self.parent.destroy)
-        self.quitButton.grid(column=0, row=1)
+
+        self.set_columns_dimension()
+
         self.parent.grab_set() # Rende la finestra MODALE (blocca l'interazione con la principale finché non la chiudi)
 
     def show_data(self, data):
         for role in data:
             values = (role.code, role.name, role.description)
             self.ship_roles.insert('', 'end', text='Listbox', values=values)
+
+    def set_columns_dimension(self):
+        font = tkFont.Font()
+        for col in self.ship_roles['columns']:
+            # Considera la larghezza dell'intestazione
+            max_width = font.measure(col)
+            
+            # Scorri tutte le righe per la colonna
+            for item in self.ship_roles.get_children():
+                cell_text = self.ship_roles.set(item, col)
+                cell_width = font.measure(cell_text)
+                if cell_width > max_width:
+                    max_width = cell_width
+            
+            # Aggiungi un po' di margine
+            max_width += 10
+            self.ship_roles.column(col, width=max_width)
