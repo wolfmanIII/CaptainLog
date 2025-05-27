@@ -14,3 +14,6 @@ Traveller Captain Log
 
 ### sv-ttk
 [pip install sv-ttk](https://pypi.org/project/sv-ttk/)
+
+### py-ulid
+[pip install py-ulid](https://pypi.org/project/py-ulid/)
