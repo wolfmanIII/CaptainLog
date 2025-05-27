@@ -6,8 +6,6 @@ from tkinter import Tk, ttk
 from model.ship_role import ShipRole
 from service.dblink import DBLink
 from view.menubar import Menubar
-from view.ship_role_list import ShipRoleList
-
 
 class Application(ttk.Frame):
     def __init__(self, master: Tk):
