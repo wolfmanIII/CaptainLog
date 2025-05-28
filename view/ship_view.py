@@ -30,11 +30,14 @@ class ShipView(ttk.Frame):
             "ship_price": "Price(Cr)"
         }
 
+        ttk.Label(self, text="🛸 Ship", font=("Segoe UI", 16)).grid(column=0, row=0, padx=5, pady=5, columnspan=len(self.columns))
+
         for i, (key, var) in enumerate(self.vars.items()):
+            i = i + 1
             ttk.Label(self, text=self.columns[key]).grid(row=i, column=0, sticky="e", padx=5, pady=5)
             ttk.Entry(self, textvariable=var).grid(row=i, column=1, sticky="ew", padx=5, pady=5)
 
-        ttk.Button(self, text="Salva", command=self.save).grid(row=len(self.vars), column=0, columnspan=2, pady=10)
+        ttk.Button(self, text="Salva", command=self.save).grid(row=len(self.vars)+1, column=1, padx=5, pady=5, sticky="w")
 
     def save(self):
         data = {k: v.get() for k, v in self.vars.items()}

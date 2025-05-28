@@ -16,7 +16,10 @@ class ShipListView(ttk.Frame):
         super().__init__(master)
         self.router = router
 
-        ttk.Label(self, text="Ships", font=("Segoe UI", 16)).grid(column=0, row=0, padx=5, pady=5, columnspan=3)
+        ttk.Label(self, text="🛸 Ships", font=("Segoe UI Emoj", 16)).grid(column=0, row=0, padx=5, pady=5, columnspan=3)
+
+        buttonGroup = ButtonGroup(self, router)
+        buttonGroup.grid(column=0, row=1, sticky="w")
 
         columns = ["code", "name", "type", "model", "price"]
         self.ships = ttk.Treeview(self, columns=columns, show="headings")
@@ -31,16 +34,8 @@ class ShipListView(ttk.Frame):
         self.ships.column('price', anchor="e")
 
         self.refresh()
-    
-        self.home_button = ttk.Button(self, text="⬅️ back", command=lambda: router.navigate("home"))
-        self.home_button.grid(column=0, row=1, padx=6, pady=5, sticky="w")
+        self.ships.grid(column=0, row=2, padx=5, pady=5)
 
-        self.ships.grid(column=0, row=2, columnspan=1, rowspan=20, padx=5, pady=5)
-
-        self.new_ship_button = ttk.Button(self, text="nuova", command=self.viewShip)
-        self.new_ship_button.grid(column=1, row=2, padx=5, pady=5, sticky="nw")
-
-        #self.set_columns_dimension()
 
     def populate_data(self):
         for ship in ShipService().get_all_ships():
@@ -58,6 +53,7 @@ class ShipListView(ttk.Frame):
         self.dialog.title("Ship")
         ship_view = ShipView(self.dialog, self.router)
         ship_view.pack(fill="both", expand=True, padx=10, pady=10)
+        self.dialog.grab_set() 
 
     def set_columns_dimension(self):
         font = tkFont.Font()
@@ -75,6 +71,20 @@ class ShipListView(ttk.Frame):
             # Aggiungi un po' di margine
             max_width += 10
             self.ships.column(col, width=max_width)
+
+class ButtonGroup(ttk.Frame):
+
+    def __init__(self, parent, router):
+        super().__init__(parent)
+        self.router = router
+        self.parent = parent
+
+        self.home_button = ttk.Button(self, text="🚀 Captain Log", command=lambda: router.navigate("home"))
+        self.home_button.grid(column=0, row=0, padx=6, pady=5, sticky="w")
+
+        self.new_ship_button = ttk.Button(self, text="➕ new", command=self.parent.viewShip)
+        self.new_ship_button.grid(column=1, row=0, padx=5, pady=5, sticky="w")
+
 
 
 
