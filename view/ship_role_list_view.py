@@ -1,32 +1,23 @@
-from sqlalchemy import select
-import tkinter
 from tkinter import ttk
 import tkinter.font as tkFont
 
-from model.ship_role import ShipRole
-from service.dblink import DBLink
 from service.ship_role_service import ShipRoleService
 
 
 class ShipRoleListView(ttk.Frame):
 
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.parent = parent
-        self.create_widtgets()
-
-    def create_widtgets(self):
+    def __init__(self, master, router):
+        super().__init__(master)
         columns = ["code", "name", "description"]
-        self.ship_roles = ttk.Treeview(self.parent, columns=columns, show="headings")
+        self.ship_roles = ttk.Treeview(self, columns=columns, show="headings")
         for column in columns:
             self.ship_roles.heading(column, text=column.capitalize())
         
         self.show_data(ShipRoleService().get_all_ship_roles())
-        self.ship_roles.grid(column=0, row=0, columnspan=2, rowspan=1)
+        self.ship_roles.grid(column=0, row=0, columnspan=1, rowspan=20, padx=5, pady=5)
 
-        self.set_columns_dimension()
+        #self.set_columns_dimension()
 
-        self.parent.grab_set() # Rende la finestra MODALE (blocca l'interazione con la principale finché non la chiudi)
 
     def show_data(self, data):
         for role in data:
