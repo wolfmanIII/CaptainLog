@@ -30,7 +30,7 @@ class ShipView(ttk.Frame):
             "ship_price": "Price(Cr)"
         }
 
-        ttk.Label(self, text="🛸 Ship", font=("Segoe UI", 16)).grid(column=0, row=0, padx=5, pady=5, columnspan=len(self.columns))
+        ttk.Label(self, text="🛸 Ship", font=("Segoe UI", 16)).grid(column=0, row=0, padx=5, pady=5, sticky="w")
 
         for i, (key, var) in enumerate(self.vars.items()):
             i = i + 1

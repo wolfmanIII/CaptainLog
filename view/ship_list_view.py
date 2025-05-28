@@ -16,10 +16,10 @@ class ShipListView(ttk.Frame):
         super().__init__(master)
         self.router = router
 
-        ttk.Label(self, text="🛸 Ships", font=("Segoe UI Emoj", 16)).grid(column=0, row=0, padx=5, pady=5, columnspan=3)
+        ttk.Label(self, text="🛸 Ships", font=("Segoe UI", 16)).grid(column=0, row=0, padx=5, pady=5, sticky="w")
 
         buttonGroup = ButtonGroup(self, router)
-        buttonGroup.grid(column=0, row=1, sticky="w")
+        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
 
         columns = ["code", "name", "type", "model", "price"]
         self.ships = ttk.Treeview(self, columns=columns, show="headings")
@@ -35,7 +35,6 @@ class ShipListView(ttk.Frame):
 
         self.refresh()
         self.ships.grid(column=0, row=2, padx=5, pady=5)
-
 
     def populate_data(self):
         for ship in ShipService().get_all_ships():
@@ -71,19 +70,18 @@ class ShipListView(ttk.Frame):
             # Aggiungi un po' di margine
             max_width += 10
             self.ships.column(col, width=max_width)
-
-class ButtonGroup(ttk.Frame):
+class ButtonGroup(tk.Frame):
 
     def __init__(self, parent, router):
-        super().__init__(parent)
+        super().__init__(parent, borderwidth=1, relief="solid")
         self.router = router
         self.parent = parent
 
-        self.home_button = ttk.Button(self, text="🚀 Captain Log", command=lambda: router.navigate("home"))
-        self.home_button.grid(column=0, row=0, padx=6, pady=5, sticky="w")
+        self.home_button = ttk.Button(self, text="🌍 Start", command=lambda: router.navigate("home"))
+        self.home_button.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         self.new_ship_button = ttk.Button(self, text="➕ new", command=self.parent.viewShip)
-        self.new_ship_button.grid(column=1, row=0, padx=5, pady=5, sticky="w")
+        self.new_ship_button.grid(column=1, row=0, padx=10, pady=10, sticky="w")
 
 
 
