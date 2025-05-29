@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Tk, ttk, Menu
+from tkinter import Tk, Menu
 from turtle import width
 
 from view.ship_list_view import ShipListView
@@ -7,6 +7,7 @@ from view.ship_role_list_view import ShipRoleListView
 
 # Classe per il menu
 class Menubar:
+
     def __init__(self, master: Tk):  # master deve essere tk.Tk() o tk.Toplevel()
         self.menubar = Menu(master)
 

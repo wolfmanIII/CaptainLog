@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from model import Ship
 
 class Contract(Base):
-    __tablename__ = "crew"
+    __tablename__ = "contract"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(String(36))

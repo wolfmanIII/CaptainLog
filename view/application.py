@@ -10,6 +10,7 @@ from view.ship_role_list_view import ShipRoleListView
 from view.ship_view import ShipView
 
 class Application(ttk.Frame):
+    
     def __init__(self, master: Tk):
         super().__init__(master)
         self.pack(fill="both", expand=True)
