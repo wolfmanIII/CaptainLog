@@ -11,8 +11,8 @@ class MaskedNumericEntry(ttk.Frame):
         self.entry = ttk.Entry(self, textvariable=self.var, **kwargs)
         self.entry.pack(fill="x")
 
-        self.error_label = tk.Label(self, text="", fg="red", font=("Arial", 8))
-        self.error_label.pack(anchor="w", pady=(2, 0))
+        self.error_label = tk.Label(self, text="", fg="red", font=("", 8))
+        self.error_label.pack(anchor="w", pady=(2,0))
 
         # Registrazione validazione solo per key
         vcmd = (self.register(self._on_validate), "%P")

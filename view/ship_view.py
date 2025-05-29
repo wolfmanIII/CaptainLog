@@ -53,10 +53,10 @@ class ShipView(ttk.Frame):
             ttk.Label(self, text=self.columns[key]).grid(row=i, column=0, sticky="e", padx=5, pady=5)
             if key == "ship_price":
                 entry = MaskedNumericEntry(self, textvariable=var, width=40, min_value=0, max_value=100_000_000_000)
-                entry.grid(row=i, column=1, sticky="ew", padx=5, pady=5)
+                entry.grid(row=i, column=1, sticky="we", padx=5, pady=5)
             else:
                 entry = ttk.Entry(self, textvariable=var, width=40)
-                entry.grid(row=i, column=1, sticky="ew", padx=5, pady=5)
+                entry.grid(row=i, column=1, sticky="we", padx=5, pady=5)
             if key == "code":
                 entry.configure(state="readonly")
 
