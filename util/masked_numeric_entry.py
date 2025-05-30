@@ -11,8 +11,8 @@ class MaskedNumericEntry(ttk.Frame):
         self.entry = ttk.Entry(self, textvariable=self.var, **kwargs)
         self.entry.pack(fill="x")
 
-        self.error_label = tk.Label(self, text="", fg="red", font=("", 8))
-        self.error_label.pack(anchor="w", pady=(2,0))
+        #self.error_label = tk.Label(self, text="", fg="red", font=("", 8))
+        #self.error_label.pack(anchor="w", pady=(2,0))
 
         # Registrazione validazione solo per key
         vcmd = (self.register(self._on_validate), "%P")
@@ -44,11 +44,12 @@ class MaskedNumericEntry(ttk.Frame):
             self._set_error("Valore non valido")
 
     def _set_error(self, message):
-        self.error_label.config(text=message)
-        self.entry.configure(foreground="red")
+        #self.error_label.config(text=message)
+        #self.entry.configure(foreground="red")
+        FloatingTooltip(self.entry, message)
 
     def _clear_error(self):
-        self.error_label.config(text="")
+        #self.error_label.config(text="")
         self.entry.configure(foreground="")
 
     def get_value(self):
@@ -57,3 +58,19 @@ class MaskedNumericEntry(ttk.Frame):
             return float(raw)
         except ValueError:
             return None
+        
+class FloatingTooltip(tk.Toplevel):
+    def __init__(self, parent, message, delay=2000):
+        super().__init__(parent)
+        self.wm_overrideredirect(True)  # Rimuove bordi e barra titolo
+        self.attributes("-topmost", True)
+
+        label = tk.Label(self, text=message, bg="#ffdddd", fg="black", relief="solid", borderwidth=1, font=("Arial", 9))
+        label.pack(ipadx=6, ipady=2)
+
+        # Posiziona vicino al widget padre
+        x = parent.winfo_rootx() + parent.winfo_width() + 10
+        y = parent.winfo_rooty()
+        self.geometry(f"+{x}+{y}")
+
+        self.after(delay, self.destroy)  # Scompare dopo `delay` ms

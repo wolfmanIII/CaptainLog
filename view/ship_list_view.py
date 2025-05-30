@@ -17,7 +17,7 @@ class ShipListView(ttk.Frame):
         self.router = router
         self.session = DBLink().getSession()
 
-        ttk.Label(self, text="Ships", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        tk.Label(self, text="Ships", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
@@ -108,8 +108,3 @@ class ButtonGroup(ttk.Frame):
 
         self.new_ship_button = ttk.Button(self, text="Delete", command=parent.delete_selected_ships)
         self.new_ship_button.grid(column=3, row=0, padx=10, pady=10, sticky="w")
-
-
-
-
-        
