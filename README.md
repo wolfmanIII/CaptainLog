@@ -23,6 +23,3 @@ Traveller Captain Log
 ### ulid-py
 
 [pip install ulid-py](https://pypi.org/project/ulid-py/)
-
-### openmoji-dist
-[pip install openmoji-dist](https://pypi.org/project/openmoji-dist/)

@@ -7,6 +7,7 @@ class MaskedNumericEntry(ttk.Frame):
         self.var = textvariable or tk.StringVar()
         self.min_value = min_value
         self.max_value = max_value
+        self.error = False
 
         self.entry = ttk.Entry(self, textvariable=self.var, **kwargs)
         self.entry.pack(fill="x")
@@ -46,6 +47,7 @@ class MaskedNumericEntry(ttk.Frame):
     def _set_error(self, message):
         #self.error_label.config(text=message)
         #self.entry.configure(foreground="red")
+        self.error = True
         FloatingTooltip(self.entry, message)
 
     def _clear_error(self):

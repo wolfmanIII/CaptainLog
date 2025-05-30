@@ -8,7 +8,7 @@ import tkinter.font as tkFont
 
 from model.ship import Ship
 from service.dblink import DBLink
-from util.masked_numeric_entry import MaskedNumericEntry
+from util.masked_numeric_entry import FloatingTooltip, MaskedNumericEntry
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
@@ -36,7 +36,8 @@ class ShipView(ttk.Frame):
             self.vars["type"].set(ship.type)
             self.vars["model"].set(ship.model)
             self.vars["ship_price"].set(ship.ship_price)
-
+        else:
+             self.vars["ship_price"].set("0")
 
         self.columns = {
             "code": "Code",
@@ -45,6 +46,8 @@ class ShipView(ttk.Frame):
             "model": "Model",
             "ship_price": "Price(Cr)"
         }
+
+        self.entries = []
 
         for i, (key, var) in enumerate(self.vars.items()):
             if id is None and key == "code":
@@ -58,26 +61,52 @@ class ShipView(ttk.Frame):
             entry.grid(row=i, column=1, sticky="we", padx=5, pady=5)
             if key == "code":
                 entry.configure(state="readonly")
+            self.entries.append(entry)
 
         ttk.Button(self, text="Save", command=lambda: self.save(id)).grid(row=len(self.vars)+1, column=1, padx=5, pady=5, sticky="w")
 
+    def validate(self):
+        result = 0
+        for entry in self.entries:
+            if type(entry).__name__ == "MaskedNumericEntry":
+                if not self.validateNumber(entry):
+                    FloatingTooltip(entry, "Valore non valido")
+                    result = result + 1
+            else:
+                if not entry.get().strip():
+                    FloatingTooltip(entry, "Campo obbligatorio")
+                    result = result + 1
+        return (result == 0)
+
+    def validateNumber(self, entry):
+        number = entry.get_value()
+        try:
+            if entry.min_value is not None and number < entry.min_value:
+                return False
+            if entry.max_value is not None and number > entry.max_value:
+                return False
+        except Exception:
+            FloatingTooltip(entry, "Valore non valido")
+            return False
+        return True
 
     def save(self, id=None):
-        data = {k: v.get() for k, v in self.vars.items()}
-        if id is None:
-            ship = Ship(**data)
-            ship.code = ulid.new().str
-        else:
-            ship = self.session.get(Ship, id)
-            for k, v in data.items():
-                setattr(ship, k, v)
+        if self.validate():
+            data = {k: v.get() for k, v in self.vars.items()}
+            if id is None:
+                ship = Ship(**data)
+                ship.code = ulid.new().str
+            else:
+                ship = self.session.get(Ship, id)
+                for k, v in data.items():
+                    setattr(ship, k, v)
 
-        cleaned_ship_price = ship.ship_price.replace(".", "").replace(",", ".")
-        ship.ship_price = float(cleaned_ship_price)
+            cleaned_ship_price = ship.ship_price.replace(".", "").replace(",", ".")
+            ship.ship_price = float(cleaned_ship_price)
 
-        if id is None:
-            self.session.add(ship)
+            if id is None:
+                self.session.add(ship)
 
-        self.session.commit()
-        self.router.get_view("ships").refresh()
-        self.parent.destroy()
+            self.session.commit()
+            self.router.get_view("ships").refresh()
+            self.parent.destroy()
