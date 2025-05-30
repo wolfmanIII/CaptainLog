@@ -48,7 +48,7 @@ class MaskedNumericEntry(ttk.Frame):
         #self.error_label.config(text=message)
         #self.entry.configure(foreground="red")
         self.error = True
-        FloatingTooltip(self.entry, message)
+        FloatingTooltipError(self.entry, message)
 
     def _clear_error(self):
         #self.error_label.config(text="")
@@ -61,7 +61,7 @@ class MaskedNumericEntry(ttk.Frame):
         except ValueError:
             return None
         
-class FloatingTooltip(tk.Toplevel):
+class FloatingTooltipError(tk.Toplevel):
     def __init__(self, parent, message, delay=2000):
         super().__init__(parent)
         self.wm_overrideredirect(True)  # Rimuove bordi e barra titolo

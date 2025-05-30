@@ -8,7 +8,7 @@ import tkinter.font as tkFont
 
 from model.ship import Ship
 from service.dblink import DBLink
-from util.masked_numeric_entry import FloatingTooltip, MaskedNumericEntry
+from util.masked_numeric_entry import FloatingTooltipError, MaskedNumericEntry
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
@@ -70,11 +70,11 @@ class ShipView(ttk.Frame):
         for entry in self.entries:
             if type(entry).__name__ == "MaskedNumericEntry":
                 if not self.validateNumber(entry):
-                    FloatingTooltip(entry, "Valore non valido")
+                    FloatingTooltipError(entry, "Valore non valido")
                     result = result + 1
             else:
                 if not entry.get().strip():
-                    FloatingTooltip(entry, "Campo obbligatorio")
+                    FloatingTooltipError(entry, "Campo obbligatorio")
                     result = result + 1
         return (result == 0)
 
@@ -86,7 +86,7 @@ class ShipView(ttk.Frame):
             if entry.max_value is not None and number > entry.max_value:
                 return False
         except Exception:
-            FloatingTooltip(entry, "Valore non valido")
+            FloatingTooltipError(entry, "Valore non valido")
             return False
         return True
 
