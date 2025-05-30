@@ -9,6 +9,7 @@ import tkinter.font as tkFont
 from model.ship import Ship
 from service.dblink import DBLink
 from util.masked_numeric_entry import FloatingTooltipError, MaskedNumericEntry
+from util.view_validator import ViewValidator
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
@@ -65,33 +66,9 @@ class ShipView(ttk.Frame):
 
         ttk.Button(self, text="Save", command=lambda: self.save(id)).grid(row=len(self.vars)+1, column=1, padx=5, pady=5, sticky="w")
 
-    def validate(self):
-        result = 0
-        for entry in self.entries:
-            if type(entry).__name__ == "MaskedNumericEntry":
-                if not self.validateNumber(entry):
-                    FloatingTooltipError(entry, "Valore non valido")
-                    result = result + 1
-            else:
-                if not entry.get().strip():
-                    FloatingTooltipError(entry, "Campo obbligatorio")
-                    result = result + 1
-        return (result == 0)
-
-    def validateNumber(self, entry):
-        number = entry.get_value()
-        try:
-            if entry.min_value is not None and number < entry.min_value:
-                return False
-            if entry.max_value is not None and number > entry.max_value:
-                return False
-        except Exception:
-            FloatingTooltipError(entry, "Valore non valido")
-            return False
-        return True
-
     def save(self, id=None):
-        if self.validate():
+
+        if ViewValidator(self.entries).validate():
             data = {k: v.get() for k, v in self.vars.items()}
             if id is None:
                 ship = Ship(**data)
