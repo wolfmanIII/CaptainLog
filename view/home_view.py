@@ -18,7 +18,7 @@ class ButtonGroup(ttk.Frame):
         super().__init__(parent, borderwidth=1, relief="solid")
 
         ttk.Button(self, text="Ships", command=lambda: router.navigate("ships")).grid(column=0, row=1, padx=10, pady=10)
-        ttk.Button(self, text="Crew").grid(column=1, row=1, padx=10, pady=10)
+        ttk.Button(self, text="Crew", command=lambda: router.navigate("crew")).grid(column=1, row=1, padx=10, pady=10)
         ttk.Button(self, text="Ship Mortgage").grid(column=2, row=1, padx=10, pady=10)
         ttk.Button(self, text="Annual Budget").grid(column=3, row=1, padx=10, pady=10)
         ttk.Button(self, text="Contracts").grid(column=4, row=1, padx=10, pady=10)

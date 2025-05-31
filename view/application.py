@@ -3,6 +3,7 @@ from sqlalchemy import column, select
 from tkinter import Tk, ttk
 
 from controller.router import Router
+from view.crew_list_view import CrewListView
 from view.home_view import HomeView
 from view.menubar import Menubar
 from view.ship_list_view import ShipListView
@@ -23,6 +24,6 @@ class Application(ttk.Frame):
 
     def register_views(self):
         self.router.add_view("home", HomeView)
-        self.router.add_view("ship", ShipView)
         self.router.add_view("ships", ShipListView)
+        self.router.add_view("crew", CrewListView)
         self.router.add_view("roles", ShipRoleListView)
