@@ -26,37 +26,37 @@ class ShipListView(ttk.Frame):
         vsb.grid(row=2, column=1, sticky="ns")
 
         columns = ["code", "name", "type", "model", "price"]
-        self.ships = ttk.Treeview(self, columns=columns, show="headings", yscrollcommand=vsb.set, height=10)
-        vsb.config(command=self.ships.yview)
+        self.ship_tree = ttk.Treeview(self, columns=columns, show="headings", yscrollcommand=vsb.set, height=10)
+        vsb.config(command=self.ship_tree.yview)
         for column in columns:
             text_show= ""
             if column == "price":
                 text_show = column.capitalize() + "(Cr)"
             else:
                 text_show = column.capitalize()
-            self.ships.heading(column, text=text_show)
+            self.ship_tree.heading(column, text=text_show)
 
-        self.ships.column('price', anchor="e")
+        self.ship_tree.column('price', anchor="e")
 
         self.refresh()
-        self.ships.grid(column=0, row=2, padx=5, pady=5)
+        self.ship_tree.grid(column=0, row=2, padx=5, pady=5)
 
         # Bind evento doppio click
-        self.ships.bind("<Double-1>", self.on_double_click_row)
+        self.ship_tree.bind("<Double-1>", self.on_double_click_row)
 
     def populate_data(self):
         for ship in ShipService().get_all_ships():
             values = (ship.code, ship.name, ship.type, ship.model, locale.format_string('%.2f', ship.ship_price, grouping=True))
-            self.ships.insert('', 'end', iid=ship.id, text='Listbox', values=values)
+            self.ship_tree.insert('', 'end', iid=ship.id, text='Listbox', values=values)
 
     def refresh(self):
-        for item in self.ships.get_children():
-            self.ships.delete(item)
+        for item in self.ship_tree.get_children():
+            self.ship_tree.delete(item)
 
         self.populate_data()
 
     def delete_selected_ships(self):
-        selected_items = self.ships.selection()
+        selected_items = self.ship_tree.selection()
         for iid in selected_items:
             # 1. Cancella dal database
             ship = self.session.get(Ship, iid)
@@ -67,7 +67,7 @@ class ShipListView(ttk.Frame):
         self.refresh()
 
     def on_double_click_row(self, event):
-        item_id = self.ships.identify_row(event.y)
+        item_id = self.ship_tree.identify_row(event.y)
         if item_id:
             self.viewShip(item_id)
 
@@ -81,20 +81,20 @@ class ShipListView(ttk.Frame):
 
     def set_columns_dimension(self):
         font = tkFont.Font()
-        for col in self.ships['columns']:
+        for col in self.ship_tree['columns']:
             # Considera la larghezza dell'intestazione
             max_width = font.measure(col)
             
             # Scorri tutte le righe per la colonna
-            for item in self.ships.get_children():
-                cell_text = self.ships.set(item, col)
+            for item in self.ship_tree.get_children():
+                cell_text = self.ship_tree.set(item, col)
                 cell_width = font.measure(cell_text)
                 if cell_width > max_width:
                     max_width = cell_width
             
             # Aggiungi un po' di margine
             max_width += 10
-            self.ships.column(col, width=max_width)
+            self.ship_tree.column(col, width=max_width)
 
 class ButtonGroup(ttk.Frame):
 
