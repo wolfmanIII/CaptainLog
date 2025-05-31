@@ -92,7 +92,7 @@ class CrewView(ttk.Frame):
                     break
 
         ttk.Label(self, text=self.columns["roles"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
-        self.role_listbox = tk.Listbox(self, selectmode='multiple', exportselection=0, height=8)
+        self.role_listbox = tk.Listbox(self, selectmode='multiple', exportselection=0, height=9)
         self.role_listbox.grid(row=row, column=1, padx=5, pady=5, sticky="we")
         row = row + 1
         for role in self.roles:
