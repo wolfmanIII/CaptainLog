@@ -20,7 +20,7 @@ class ShipView(ttk.Frame):
         self.router = router
         self.session = DBLink().getSession()
 
-        ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, columnspan=2, padx=10, pady=10)
                 
         self.vars = {
             "code": tk.StringVar(),

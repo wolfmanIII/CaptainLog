@@ -22,7 +22,7 @@ class CrewView(ttk.Frame):
         self.roles = self.session.query(ShipRole).order_by(ShipRole.name).all()
         self.crew = Crew()
 
-        ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, columnspan=2)
                 
         self.vars = {
             "code": tk.StringVar(),
