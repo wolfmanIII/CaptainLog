@@ -68,7 +68,7 @@ class ShipView(ttk.Frame):
 
     def save(self, id=None):
 
-        if ViewValidator(self.entries).validate():
+        if ViewValidator(self.entries).is_valid():
             data = {k: v.get() for k, v in self.vars.items()}
             if id is None:
                 ship = Ship(**data)

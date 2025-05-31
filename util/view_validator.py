@@ -8,7 +8,7 @@ class ViewValidator():
     def __init__(self, entries: list[ttk.Entry]):
         self.entries = entries
     
-    def validate(self):
+    def is_valid(self):
         result = 0
         for entry in self.entries:
             if type(entry).__name__ == "MaskedNumericEntry":
