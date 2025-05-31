@@ -22,8 +22,12 @@ class ShipListView(ttk.Frame):
         buttonGroup = ButtonGroup(self, router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
 
+        vsb = ttk.Scrollbar(self, orient="vertical")
+        vsb.grid(row=2, column=1, sticky="ns")
+
         columns = ["code", "name", "type", "model", "price"]
-        self.ships = ttk.Treeview(self, columns=columns, show="headings")
+        self.ships = ttk.Treeview(self, columns=columns, show="headings", yscrollcommand=vsb.set, height=10)
+        vsb.config(command=self.ships.yview)
         for column in columns:
             text_show= ""
             if column == "price":

@@ -24,8 +24,12 @@ class CrewListView(ttk.Frame):
         buttonGroup = ButtonGroup(self, router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
 
+        vsb = ttk.Scrollbar(self, orient="vertical")
+        vsb.grid(row=2, column=1, sticky="ns")
+
         columns = ["code", "name", "surname", "nickname", "ship", "roles"]
-        self.crew_tree = ttk.Treeview(self, columns=columns, show="headings")
+        self.crew_tree = ttk.Treeview(self, columns=columns, show="headings", yscrollcommand=vsb.set, height=10)
+        vsb.config(command=self.crew_tree.yview)
         for column in columns:
             text_show= ""
             text_show = column.capitalize()
