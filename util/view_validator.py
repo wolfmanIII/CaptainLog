@@ -24,6 +24,7 @@ class ViewValidator():
     def validateNumber(self, entry):
         number = entry.get_value()
         try:
+            float(number)
             if entry.min_value is not None and number < entry.min_value:
                 return False
             if entry.max_value is not None and number > entry.max_value:

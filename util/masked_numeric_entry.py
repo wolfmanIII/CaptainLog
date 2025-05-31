@@ -7,13 +7,9 @@ class MaskedNumericEntry(ttk.Frame):
         self.var = textvariable or tk.StringVar()
         self.min_value = min_value
         self.max_value = max_value
-        self.error = False
 
         self.entry = ttk.Entry(self, textvariable=self.var, **kwargs)
         self.entry.pack(fill="x")
-
-        #self.error_label = tk.Label(self, text="", fg="red", font=("", 8))
-        #self.error_label.pack(anchor="w", pady=(2,0))
 
         # Registrazione validazione solo per key
         vcmd = (self.register(self._on_validate), "%P")
@@ -45,13 +41,9 @@ class MaskedNumericEntry(ttk.Frame):
             self._set_error("Valore non valido")
 
     def _set_error(self, message):
-        #self.error_label.config(text=message)
-        #self.entry.configure(foreground="red")
-        self.error = True
         FloatingTooltipError(self.entry, message)
 
     def _clear_error(self):
-        #self.error_label.config(text="")
         self.entry.configure(foreground="")
 
     def get_value(self):
