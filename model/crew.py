@@ -27,6 +27,6 @@ class Crew(Base):
     birth_year: Mapped[int] = mapped_column(Integer, nullable=True)
     birth_day: Mapped[int] = mapped_column(Integer, nullable=True)
     birth_world: Mapped[str] = mapped_column(String(100), nullable=True)
-    role: Mapped[List["ShipRole"]] = relationship(secondary=crew_ship_role_association_table)
+    roles: Mapped[List["ShipRole"]] = relationship(secondary=crew_ship_role_association_table)
     ship_id: Mapped[int] = mapped_column(ForeignKey("ship.id"), nullable=True)
     ship: Mapped["Ship"] = relationship(back_populates="crew")

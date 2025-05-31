@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.font as tkFont
 
-from model import crew
+from model import crew, ship
 from model.crew import Crew
 from service.dblink import DBLink
 from service.crew_service import CrewService
@@ -24,7 +24,7 @@ class CrewListView(ttk.Frame):
         buttonGroup = ButtonGroup(self, router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
 
-        columns = ["code", "name", "surname", "nickname", "ship"]
+        columns = ["code", "name", "surname", "nickname", "ship", "roles"]
         self.crew_tree = ttk.Treeview(self, columns=columns, show="headings")
         for column in columns:
             text_show= ""
@@ -40,7 +40,17 @@ class CrewListView(ttk.Frame):
     def populate_data(self):
         for crew in CrewService().get_all_crew():
             ship_name = crew.ship.name if crew.ship else ""
-            values = (crew.code, crew.name, crew.surname, crew.nickname, ship_name)
+            ship_roles = ""
+            i = 0
+            for role in crew.roles:
+                i = i + 1
+                if i < len(crew.roles):
+                    ship_roles = ship_roles + role.name + " | "
+                else:
+                    ship_roles = ship_roles + role.name
+                    
+                    
+            values = (crew.code, crew.name, crew.surname, crew.nickname, ship_name, ship_roles)
             self.crew_tree.insert('', 'end', iid=crew.id, text='Listbox', values=values)
 
     def refresh(self):

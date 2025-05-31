@@ -1,3 +1,4 @@
+from re import split
 from numpy import size
 from sqlalchemy import null
 import ulid
@@ -7,6 +8,7 @@ import tkinter.font as tkFont
 
 from model.crew import Crew
 from model.ship import Ship
+from model.ship_role import ShipRole
 from service.dblink import DBLink
 from util.view_validator import ViewValidator
 
@@ -17,6 +19,7 @@ class CrewView(ttk.Frame):
         self.router = router
         self.session = DBLink().getSession()
         self.ships = self.session.query(Ship).order_by(Ship.name).all()
+        self.roles = self.session.query(ShipRole).order_by(ShipRole.name).all()
         self.crew = Crew()
 
         ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
@@ -43,7 +46,8 @@ class CrewView(ttk.Frame):
             "name": "Name",
             "surname": "Surname",
             "nickname": "Nickname",
-            "ship_id": "Ship"
+            "ship_id": "Ship",
+            "roles": "Roles"
         }
 
         self.entries = []
@@ -87,8 +91,35 @@ class CrewView(ttk.Frame):
                     self.ship_combo.current(i)
                     break
 
+        ttk.Label(self, text=self.columns["roles"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
+        self.role_listbox = tk.Listbox(self, selectmode='multiple', exportselection=0, height=8)
+        self.role_listbox.grid(row=row, column=1, padx=5, pady=5, sticky="we")
+        row = row + 1
+        for role in self.roles:
+            self.role_listbox.insert(tk.END, role.name)
+        self.load_roles(self.crew)
 
         ttk.Button(self, text="Save", command=lambda: self.save(id)).grid(row=row, column=1, padx=5, pady=5, sticky="w")
+
+    def load_roles(self, crew):
+        # Ottenere i nomi dei ruoli associati al membro dell'equipaggio
+        crew_roles = [role.name for role in crew.roles]  # Assumendo che crew.roles sia una lista di oggetti ShipRole
+
+        # Selezionare i ruoli nel Listbox
+        for i in range(self.role_listbox.size()):
+            if self.role_listbox.get(i) in crew_roles:
+                self.role_listbox.selection_set(i)
+
+    def get_selected_roles(self):
+        selected_indices = self.role_listbox.curselection()
+        selected_roles = [self.role_listbox.get(i) for i in selected_indices]
+        return selected_roles
+
+    def save_roles(self, crew):
+        selected_role_names = self.get_selected_roles()
+        # Recuperare gli oggetti ShipRole corrispondenti ai nomi selezionati
+        selected_roles = self.session.query(ShipRole).filter(ShipRole.name.in_(selected_role_names)).all()
+        crew.roles = selected_roles
 
     def save(self, id=None):
 
@@ -108,6 +139,8 @@ class CrewView(ttk.Frame):
 
             if id is None:
                 self.session.add(crew)
+
+            self.save_roles(crew)
 
             self.session.commit()
             self.router.get_view("crew").refresh()

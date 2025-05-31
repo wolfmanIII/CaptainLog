@@ -11,6 +11,7 @@ class ViewValidator():
     def is_valid(self):
         result = 0
         for entry in self.entries:
+            type(entry).__name__
             if type(entry).__name__ == "MaskedNumericEntry":
                 if not self.validateNumber(entry):
                     FloatingTooltipError(entry, "Valore non valido")
