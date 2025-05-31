@@ -8,6 +8,11 @@ class MaskedNumericEntry(ttk.Frame):
         self.min_value = min_value
         self.max_value = max_value
 
+        if self.var is not None:
+            number = float(self.var.get())
+            formatted = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            self.var.set(formatted)
+
         self.entry = ttk.Entry(self, textvariable=self.var, **kwargs)
         self.entry.pack(fill="x")
 
