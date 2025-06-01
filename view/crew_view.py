@@ -97,13 +97,13 @@ class CrewView(ttk.Frame):
         row = row + 1
         for role in self.roles:
             self.role_listbox.insert(tk.END, role.name)
-        self.load_roles(self.crew)
+        self.load_roles()
 
-        ttk.Button(self, text="Save", command=lambda: self.save(id)).grid(row=row, column=1, padx=5, pady=5, sticky="w")
+        ttk.Button(self, text="Save", command=lambda: self.save()).grid(row=row, column=1, padx=5, pady=5, sticky="w")
 
-    def load_roles(self, crew):
+    def load_roles(self):
         # Ottenere i nomi dei ruoli associati al membro dell'equipaggio
-        crew_roles = [role.name for role in crew.roles]  # Assumendo che crew.roles sia una lista di oggetti ShipRole
+        crew_roles = [role.name for role in self.crew.roles]  # Assumendo che crew.roles sia una lista di oggetti ShipRole
 
         # Selezionare i ruoli nel Listbox
         for i in range(self.role_listbox.size()):
@@ -115,13 +115,13 @@ class CrewView(ttk.Frame):
         selected_roles = [self.role_listbox.get(i) for i in selected_indices]
         return selected_roles
 
-    def save_roles(self, crew):
+    def save_roles(self):
         selected_role_names = self.get_selected_roles()
         # Recuperare gli oggetti ShipRole corrispondenti ai nomi selezionati
         selected_roles = self.session.query(ShipRole).filter(ShipRole.name.in_(selected_role_names)).all()
-        crew.roles = selected_roles
+        self.crew.roles = selected_roles
 
-    def save(self, id=None):
+    def save(self):
 
         if ViewValidator(self.entries).is_valid():
             data = {k: v.get() for k, v in self.vars.items()}
@@ -129,18 +129,14 @@ class CrewView(ttk.Frame):
             index = self.ship_combo.current()
             data["ship_id"] = self.ships[index].id if index != -1 else None
 
-            if id is None:
-                crew = Crew(**data)
-                crew.code = ulid.new().str
-            else:
-                crew = self.session.get(Crew, id)
-                for k, v in data.items():
-                    setattr(crew, k, v)
+            for k, v in data.items():
+                setattr(self.crew, k, v)
 
-            if id is None:
-                self.session.add(crew)
+            if self.crew.id is None:
+                self.crew.code = ulid.new().str
+                self.session.add(self.crew)
 
-            self.save_roles(crew)
+            self.save_roles()
 
             self.session.commit()
             self.router.get_view("crew").refresh()
