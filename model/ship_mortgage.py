@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 
 from model.base import Base
@@ -19,4 +19,9 @@ class ShipMortgage(Base):
     name: Mapped[str] = mapped_column(String(100))
     ship_id: Mapped[int] = mapped_column(ForeignKey("ship.id"))
     ship: Mapped["Ship"] = relationship(back_populates="ship_mortgage", single_parent=True)
+    start_day: Mapped[int] = mapped_column(Integer)
+    start_year: Mapped[int] = mapped_column(Integer)
+    ship_shares: Mapped[int] = mapped_column(Integer, nullable=True)
+    advance_payment: Mapped[float] = mapped_column(Numeric(11, 2), nullable=True)
+    discount: Mapped[float] = mapped_column(Numeric(11, 2), nullable=True)
     annual_budgets: Mapped[List["AnnualBudget"]] = relationship(back_populates="ship_mortgage")

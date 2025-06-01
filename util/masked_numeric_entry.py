@@ -7,28 +7,36 @@ class MaskedNumericEntry(ttk.Frame):
         self.var = textvariable or tk.StringVar()
         self.min_value = min_value
         self.max_value = max_value
+        self.required = getattr(self, "required", True)
 
-        if self.var is not None:
-            number = float(self.var.get())
-            formatted = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-            self.var.set(formatted)
+        if self.var.get().strip():
+            try:
+                number = float(self.var.get().replace(",", "."))
+                formatted = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                self.var.set(formatted)
+            except ValueError:
+                pass  # Inizialmente può non essere un numero valido
 
         self.entry = ttk.Entry(self, textvariable=self.var, **kwargs)
         self.entry.pack(fill="x")
 
-        # Registrazione validazione solo per key
         vcmd = (self.register(self._on_validate), "%P")
         self.entry.configure(validate="key", validatecommand=vcmd)
-
-        # Bind focus-out per validazione completa
         self.entry.bind("<FocusOut>", self._on_focus_out)
 
     def _on_validate(self, value):
-        # Accetta solo cifre, punto e virgola durante digitazione
         return all(c.isdigit() or c in {".", ","} for c in value)
 
     def _on_focus_out(self, event):
-        value = self.var.get()
+        value = self.var.get().strip()
+
+        if not value:
+            if self.required:
+                self._set_error("Campo obbligatorio")
+            else:
+                self._clear_error()
+            return
+
         raw = value.replace(".", "").replace(",", ".")
         try:
             number = float(raw)
@@ -38,7 +46,6 @@ class MaskedNumericEntry(ttk.Frame):
             if self.max_value is not None and number > self.max_value:
                 self._set_error(f"Max: {self.max_value}")
                 return
-            # Formatta e pulisce errore
             self._clear_error()
             formatted = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
             self.var.set(formatted)
@@ -52,24 +59,35 @@ class MaskedNumericEntry(ttk.Frame):
         self.entry.configure(foreground="")
 
     def get_value(self):
+        raw_value = self.var.get().strip()
+        if not raw_value:
+            return None
         try:
-            raw = self.var.get().replace(".", "").replace(",", ".")
+            raw = raw_value.replace(".", "").replace(",", ".")
             return float(raw)
         except ValueError:
             return None
-        
+
+
 class FloatingTooltipError(tk.Toplevel):
     def __init__(self, parent, message, delay=2000):
         super().__init__(parent)
-        self.wm_overrideredirect(True)  # Rimuove bordi e barra titolo
+        self.wm_overrideredirect(True)
         self.attributes("-topmost", True)
 
-        label = tk.Label(self, text=message, bg="#ffdddd", fg="black", relief="solid", borderwidth=1, font=("Arial", 9))
+        label = tk.Label(
+            self,
+            text=message,
+            bg="#ffdddd",
+            fg="black",
+            relief="solid",
+            borderwidth=1,
+            font=("Arial", 9)
+        )
         label.pack(ipadx=6, ipady=2)
 
-        # Posiziona vicino al widget padre
         x = parent.winfo_rootx() + parent.winfo_width() + 10
         y = parent.winfo_rooty()
         self.geometry(f"+{x}+{y}")
 
-        self.after(delay, self.destroy)  # Scompare dopo `delay` ms
+        self.after(delay, self.destroy)

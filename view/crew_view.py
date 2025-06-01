@@ -78,6 +78,7 @@ class CrewView(ttk.Frame):
         ttk.Label(self, text=self.columns["nickname"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
         self.nickname_entry = ttk.Entry(self, textvariable=self.vars["nickname"], width=40)
         self.nickname_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+        self.nickname_entry.required = False
         row = row + 1
         self.entries.append(self.nickname_entry)
 

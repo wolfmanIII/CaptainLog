@@ -95,8 +95,9 @@ class ShipView(ttk.Frame):
             for k, v in data.items():
                 setattr(self.ship, k, v)
 
-            cleaned_ship_price = self.ship.ship_price.replace(".", "").replace(",", ".")
-            self.ship.ship_price = float(cleaned_ship_price)
+            if self.ship.ship_price is not None:
+                cleaned_ship_price = self.ship.ship_price.replace(".", "").replace(",", ".")
+                self.ship.ship_price = float(cleaned_ship_price)
 
             if self.ship.id is None:
                 self.ship.code = ulid.new().str
