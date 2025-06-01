@@ -54,7 +54,7 @@ class CrewView(ttk.Frame):
     def create_widtgets(self):
         ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, columnspan=2)
 
-        row = 1;
+        row = 1
         if self.crew.id is not None:
             ttk.Label(self, text=self.columns["code"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
             self.code_entry = ttk.Entry(self, textvariable=self.vars["code"], width=40)

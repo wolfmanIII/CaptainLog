@@ -51,7 +51,6 @@ class ShipView(ttk.Frame):
         self.create_widtgets()
 
     def create_widtgets(self):
-
         ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, columnspan=2, padx=10, pady=10)
 
         row = 1
@@ -89,9 +88,7 @@ class ShipView(ttk.Frame):
 
         ttk.Button(self, text="Save", command=lambda: self.save()).grid(row=row, column=1, padx=5, pady=5, sticky="w")
 
-
     def save(self):
-
         if ViewValidator(self.entries).is_valid():
             data = {k: v.get() for k, v in self.vars.items()}
 
