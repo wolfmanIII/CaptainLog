@@ -23,3 +23,7 @@ Traveller Captain Log
 ### ulid-py
 
 [pip install ulid-py](https://pypi.org/project/ulid-py/)
+
+### pillow
+
+[pip install pillow](https://pypi.org/project/pillow/)
