@@ -21,7 +21,7 @@ class ShipListView(ttk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.img_title_tk = EmojiCache(size=18).get("2708.png") #Airplane
+        self.img_title_tk = EmojiCache(size=20).get("2708.png") #Airplane
         self.title_lable = tk.Label(self, text="Ships", font=("", 18), image=self.img_title_tk, compound="left", padx=5)
         self.title_lable.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
