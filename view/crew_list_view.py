@@ -18,10 +18,12 @@ class CrewListView(ttk.Frame):
         super().__init__(master)
         self.router = router
         self.session = DBLink().getSession()
+        self.create_widgets()
 
+    def create_widgets(self):
         tk.Label(self, text="Crew", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
-        buttonGroup = ButtonGroup(self, router)
+        buttonGroup = ButtonGroup(self, self.router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
 
         vsb = ttk.Scrollbar(self, orient="vertical")
