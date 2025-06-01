@@ -8,7 +8,7 @@ import tkinter.font as tkFont
 
 from model.ship import Ship
 from service.dblink import DBLink
-from util.masked_numeric_entry import FloatingTooltipError, MaskedNumericEntry
+from util.masked_numeric_entry import MaskedNumericEntry
 from util.view_validator import ViewValidator
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
@@ -19,6 +19,7 @@ class ShipView(ttk.Frame):
         self.parent = master
         self.router = router
         self.session = DBLink().getSession()
+        self.ship = Ship()
 
         ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, columnspan=2, padx=10, pady=10)
                 
@@ -31,12 +32,12 @@ class ShipView(ttk.Frame):
         }
 
         if id is not None:
-            ship = self.session.get(Ship, id)
-            self.vars["code"].set(ship.code)
-            self.vars["name"].set(ship.name)
-            self.vars["type"].set(ship.type)
-            self.vars["model"].set(ship.model)
-            self.vars["ship_price"].set(ship.ship_price)
+            self.ship = self.session.get(Ship, id)
+            self.vars["code"].set(self.ship.code)
+            self.vars["name"].set(self.ship.name)
+            self.vars["type"].set(self.ship.type)
+            self.vars["model"].set(self.ship.model)
+            self.vars["ship_price"].set(self.ship.ship_price)
         else:
              self.vars["ship_price"].set("0")
 
@@ -64,25 +65,22 @@ class ShipView(ttk.Frame):
                 entry.configure(state="readonly")
             self.entries.append(entry)
 
-        ttk.Button(self, text="Save", command=lambda: self.save(id)).grid(row=len(self.vars)+1, column=1, padx=5, pady=5, sticky="w")
+        ttk.Button(self, text="Save", command=lambda: self.save()).grid(row=len(self.vars)+1, column=1, padx=5, pady=5, sticky="w")
 
-    def save(self, id=None):
+    def save(self):
 
         if ViewValidator(self.entries).is_valid():
             data = {k: v.get() for k, v in self.vars.items()}
-            if id is None:
-                ship = Ship(**data)
-                ship.code = ulid.new().str
-            else:
-                ship = self.session.get(Ship, id)
-                for k, v in data.items():
-                    setattr(ship, k, v)
 
-            cleaned_ship_price = ship.ship_price.replace(".", "").replace(",", ".")
-            ship.ship_price = float(cleaned_ship_price)
+            for k, v in data.items():
+                setattr(self.ship, k, v)
 
-            if id is None:
-                self.session.add(ship)
+            cleaned_ship_price = self.ship.ship_price.replace(".", "").replace(",", ".")
+            self.ship.ship_price = float(cleaned_ship_price)
+
+            if self.ship.id is None:
+                self.ship.code = ulid.new().str
+                self.session.add(self.ship)
 
             self.session.commit()
             self.router.get_view("ships").refresh()
