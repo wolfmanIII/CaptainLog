@@ -6,7 +6,9 @@ import tkinter.font as tkFont
 from model.ship import Ship
 from service.dblink import DBLink
 from service.ship_service import ShipService
+from util.emoji_cache import EmojiCache
 from view.ship_view import ShipView
+from PIL import ImageTk
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
@@ -19,7 +21,9 @@ class ShipListView(ttk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        tk.Label(self, text="Ships", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        self.img_title_tk = EmojiCache(size=18).get("2708.png") #Airplane
+        self.title_lable = tk.Label(self, text="Ships", font=("", 18), image=self.img_title_tk, compound="left", padx=5)
+        self.title_lable.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, self.router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
