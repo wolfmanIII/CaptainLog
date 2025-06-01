@@ -21,8 +21,6 @@ class CrewView(ttk.Frame):
         self.ships = self.session.query(Ship).order_by(Ship.name).all()
         self.roles = self.session.query(ShipRole).order_by(ShipRole.name).all()
         self.crew = Crew()
-
-        ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, columnspan=2)
                 
         self.vars = {
             "code": tk.StringVar(),
@@ -51,6 +49,10 @@ class CrewView(ttk.Frame):
         }
 
         self.entries = []
+        self.create_widtgets()
+
+    def create_widtgets(self):
+        ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, columnspan=2)
 
         row = 1;
         if self.crew.id is not None:

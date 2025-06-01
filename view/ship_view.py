@@ -20,8 +20,6 @@ class ShipView(ttk.Frame):
         self.router = router
         self.session = DBLink().getSession()
         self.ship = Ship()
-
-        ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, columnspan=2, padx=10, pady=10)
                 
         self.vars = {
             "code": tk.StringVar(),
@@ -50,22 +48,47 @@ class ShipView(ttk.Frame):
         }
 
         self.entries = []
+        self.create_widtgets()
 
-        for i, (key, var) in enumerate(self.vars.items()):
-            if id is None and key == "code":
-                continue
-            i = i + 1
-            ttk.Label(self, text=self.columns[key]).grid(row=i, column=0, sticky="e", padx=5, pady=5)
-            if key == "ship_price":
-                entry = MaskedNumericEntry(self, textvariable=var, width=40, min_value=0, max_value=100_000_000_000)
-            else:
-                entry = ttk.Entry(self, textvariable=var, width=40)
-            entry.grid(row=i, column=1, sticky="we", padx=5, pady=5)
-            if key == "code":
-                entry.configure(state="readonly")
-            self.entries.append(entry)
+    def create_widtgets(self):
 
-        ttk.Button(self, text="Save", command=lambda: self.save()).grid(row=len(self.vars)+1, column=1, padx=5, pady=5, sticky="w")
+        ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, columnspan=2, padx=10, pady=10)
+
+        row = 1
+        if self.ship.id is not None:
+            ttk.Label(self, text=self.columns["code"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
+            self.code_entry = ttk.Entry(self, textvariable=self.vars["code"], width=40)
+            self.code_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+            self.code_entry.configure(state="readonly")
+            self.entries.append(self.code_entry)
+            row = row + 1
+        
+        ttk.Label(self, text=self.columns["name"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
+        self.name_entry = ttk.Entry(self, textvariable=self.vars["name"], width=40)
+        self.name_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+        self.entries.append(self.name_entry)
+        row = row + 1
+
+        ttk.Label(self, text=self.columns["type"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
+        self.type_entry = ttk.Entry(self, textvariable=self.vars["type"], width=40)
+        self.type_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+        self.entries.append(self.type_entry)
+        row = row + 1
+
+        ttk.Label(self, text=self.columns["model"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
+        self.model_entry = ttk.Entry(self, textvariable=self.vars["model"], width=40)
+        self.model_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+        self.entries.append(self.model_entry)
+        row = row + 1
+
+        ttk.Label(self, text=self.columns["ship_price"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
+        self.ship_price_entry = MaskedNumericEntry(self, textvariable=self.vars["ship_price"], width=40, min_value=0, max_value=100_000_000_000)
+        self.ship_price_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+        self.entries.append(self.ship_price_entry)
+        row = row + 1
+
+        ttk.Button(self, text="Save", command=lambda: self.save()).grid(row=row, column=1, padx=5, pady=5, sticky="w")
+
 
     def save(self):
 
