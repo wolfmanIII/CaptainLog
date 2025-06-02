@@ -13,7 +13,9 @@ class HomeView(ttk.Frame):
 
     def create_widgets(self, master):
         master.columnconfigure(0, weight=1)
-        ttk.Label(self, text="Captain Log", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        self.img_captain_log_tk = EmojiCache(size=34).get("1f468-200d-1f680.png") #Airplane
+        self.captain_label = ttk.Label(self, text="Captain Log", font=("", 32), image=self.img_captain_log_tk, compound="left")
+        self.captain_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
@@ -29,7 +31,30 @@ class ButtonGroup(ttk.Frame):
         )
         self.ships_label.grid(column=0, row=1, padx=10, pady=10)
 
-        ttk.Button(self, text="Crew", command=lambda: parent.router.navigate("crew")).grid(column=1, row=1, padx=10, pady=10)
-        ttk.Button(self, text="Ship Mortgage").grid(column=2, row=1, padx=10, pady=10)
-        ttk.Button(self, text="Annual Budget").grid(column=3, row=1, padx=10, pady=10)
-        ttk.Button(self, text="Contracts").grid(column=4, row=1, padx=10, pady=10)
+        self.img_crew_tk = EmojiCache().get("1f465.png") #Users
+        self.img_crew_label = ttk.Button(
+            self, text="Crew", image=self.img_crew_tk, compound="left",
+            command=lambda: parent.router.navigate("crew")
+        )
+        self.img_crew_label.grid(column=1, row=1, padx=10, pady=10)
+
+        self.img_ship_mortgage_tk = EmojiCache().get("1f4b8.png") #Money with wings
+        self.img_ship_mortgage_label = ttk.Button(
+            self, text="Ship Mortgage", image=self.img_ship_mortgage_tk, compound="left",
+            command=lambda: parent.router.navigate("ship_mortgage")
+        )
+        self.img_ship_mortgage_label.grid(column=2, row=1, padx=10, pady=10)
+
+        self.img_annual_budget_tk = EmojiCache().get("1f4c9.png") #Chart decreasing 
+        self.img_annual_budget_label = ttk.Button(
+            self, text="Annual Budget", image=self.img_annual_budget_tk, compound="left",
+            command=lambda: parent.router.navigate("annual_budget")
+        )
+        self.img_annual_budget_label.grid(column=3, row=1, padx=10, pady=10)
+
+        self.img_contracts_tk = EmojiCache().get("1f4dd.png") #Memo 
+        self.img_contracts_label = ttk.Button(
+            self, text="Contracts", image=self.img_contracts_tk, compound="left",
+            command=lambda: parent.router.navigate("contracts")
+        )
+        self.img_contracts_label.grid(column=4, row=1, padx=10, pady=10)

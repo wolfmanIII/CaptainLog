@@ -22,8 +22,8 @@ class ShipListView(ttk.Frame):
 
     def create_widgets(self):
         self.img_title_tk = EmojiCache(size=20).get("2708.png") #Airplane
-        self.title_lable = tk.Label(self, text="Ships", font=("", 18), image=self.img_title_tk, compound="left", padx=5)
-        self.title_lable.grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        self.title_label = ttk.Label(self, text="Ships", font=("", 18), image=self.img_title_tk, compound="left")
+        self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, self.router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
