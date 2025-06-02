@@ -10,6 +10,7 @@ from model.crew import Crew
 from model.ship import Ship
 from model.ship_role import ShipRole
 from service.dblink import DBLink
+from util.emoji_cache import EmojiCache
 from util.view_validator import ViewValidator
 
 class CrewView(ttk.Frame):
@@ -52,7 +53,9 @@ class CrewView(ttk.Frame):
         self.create_widtgets()
 
     def create_widtgets(self):
-        ttk.Label(self, text="Crew member", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, columnspan=2)
+        self.img_title_tk = EmojiCache(size=32).get("1f465.png") #Airplane
+        self.title_label = ttk.Label(self, text="Crew member", font=("", 30), image=self.img_title_tk, compound="left")
+        self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="we", columnspan=2)
 
         row = 1
         if self.crew.id is not None:

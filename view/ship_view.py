@@ -8,6 +8,7 @@ import tkinter.font as tkFont
 
 from model.ship import Ship
 from service.dblink import DBLink
+from util.emoji_cache import EmojiCache
 from util.masked_numeric_entry import MaskedNumericEntry
 from util.view_validator import ViewValidator
 
@@ -52,7 +53,10 @@ class ShipView(ttk.Frame):
         self.create_widtgets()
 
     def create_widtgets(self):
-        ttk.Label(self, text="Ship", font=("", 18)).grid(column=0, row=0, columnspan=2, padx=10, pady=10)
+        
+        self.img_title_tk = EmojiCache(size=32).get("2708.png") #Airplane
+        self.title_label = ttk.Label(self, text="Ship", font=("", 30), image=self.img_title_tk, compound="left")
+        self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="we", columnspan=2)
 
         row = 1
         if self.ship.id is not None:

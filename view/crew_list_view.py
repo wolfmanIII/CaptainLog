@@ -7,6 +7,7 @@ from model import crew, ship
 from model.crew import Crew
 from service.dblink import DBLink
 from service.crew_service import CrewService
+from util.emoji_cache import EmojiCache
 from view.crew_view import CrewView
 #from view.ship_view import ShipView
 
@@ -21,7 +22,9 @@ class CrewListView(ttk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        tk.Label(self, text="Crew", font=("", 18)).grid(column=0, row=0, padx=10, pady=10, sticky="w")
+        self.img_title_tk = EmojiCache(size=32).get("1f465.png") # Users
+        self.title_label = ttk.Label(self, text="Crew", font=("", 30), image=self.img_title_tk, compound="left")
+        self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, self.router)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
@@ -111,14 +114,18 @@ class ButtonGroup(ttk.Frame):
     def __init__(self, parent, router):
         super().__init__(parent, borderwidth=1, relief="solid")
 
-        self.home_button = ttk.Button(self, text="Back", command=lambda: router.navigate("home"))
+        self.img_back_tk = EmojiCache(size=16).get("2b05.png") # Back
+        self.home_button = ttk.Button(self, text="Back", command=lambda: router.navigate("home"), image=self.img_back_tk, compound="left")
         self.home_button.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
-        self.refresh_button = ttk.Button(self, text="Refresh", command=parent.refresh)
+        self.img_refresh_tk = EmojiCache(size=16).get("1f503.png") # Reload
+        self.refresh_button = ttk.Button(self, text="Refresh", command=parent.refresh, image=self.img_refresh_tk, compound="left")
         self.refresh_button.grid(column=1, row=0, padx=10, pady=10, sticky="w")
 
-        self.new_ship_button = ttk.Button(self, text="New", command=parent.viewCrew)
+        self.img_new_tk = EmojiCache(size=16).get("1f195.png") # New
+        self.new_ship_button = ttk.Button(self, text="New", command=parent.viewCrew, image=self.img_new_tk, compound="left")
         self.new_ship_button.grid(column=2, row=0, padx=10, pady=10, sticky="w")
 
-        self.new_ship_button = ttk.Button(self, text="Delete", command=parent.delete_selected_crew)
+        self.img_trash_tk = EmojiCache(size=16).get("1f6ae.png") # Trash
+        self.new_ship_button = ttk.Button(self, text="Delete", command=parent.delete_selected_crew, image=self.img_trash_tk, compound="left")
         self.new_ship_button.grid(column=3, row=0, padx=10, pady=10, sticky="w")
