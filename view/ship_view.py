@@ -35,7 +35,8 @@ class ShipView(ttk.Frame):
             self.vars["name"].set(self.ship.name)
             self.vars["type"].set(self.ship.type)
             self.vars["model"].set(self.ship.model)
-            self.vars["ship_price"].set(self.ship.ship_price)
+            formatted_ship_price = f"{self.ship.ship_price:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            self.vars["ship_price"].set(formatted_ship_price)
         else:
              self.vars["ship_price"].set("0")
 

@@ -11,7 +11,7 @@ class MaskedNumericEntry(ttk.Frame):
 
         if self.var.get().strip():
             try:
-                number = float(self.var.get().replace(",", "."))
+                number = float(self.var.get().replace(".", "").replace(",", "."))
                 formatted = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
                 self.var.set(formatted)
             except ValueError:
