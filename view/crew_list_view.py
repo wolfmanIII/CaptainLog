@@ -9,7 +9,6 @@ from service.dblink import DBLink
 from service.crew_service import CrewService
 from util.emoji_cache import EmojiCache
 from view.crew_view import CrewView
-#from view.ship_view import ShipView
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
