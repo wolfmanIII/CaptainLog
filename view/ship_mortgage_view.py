@@ -2,6 +2,8 @@ import locale
 import tkinter as tk
 from tkinter import ttk
 
+from pyparsing import col
+
 from model.ship import Ship
 from model.ship_mortage_interest_rate import ShipMortageInterestRate
 from model.ship_mortgage import ShipMortgage
@@ -37,8 +39,8 @@ class ShipMortgageView(ttk.Frame):
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
 
         self.img_rate_tk = EmojiCache(size=20).get("1f4c8.png") # Chart increasing
-        self.rate_label = ttk.Label(self, text="Annual interest rates summary", font=("", 18), image=self.img_rate_tk, compound="left")
-        self.rate_label.grid(column=0, row=2, padx=10, pady=10, sticky="w")
+        self.rate_label = ttk.Label(self, text="Annual interest rates", font=("", 18), image=self.img_rate_tk, compound="left")
+        self.rate_label.grid(column=0, row=2, padx=10, pady=5, sticky="w")
 
         columns = ["Duration(years)", "Ship cost multiplier", "Mortgage payment divider", "Annual interest rate(%)"]
         self.mortgage_tree = ttk.Treeview(self, columns=columns, show="headings", height=4)
@@ -47,15 +49,21 @@ class ShipMortgageView(ttk.Frame):
             text_show = column
             self.mortgage_tree.heading(column, text=text_show)
 
-        self.mortgage_tree.grid(column=0, row=3, padx=5, pady=5)
+        self.mortgage_tree.grid(column=0, row=3, padx=5, pady=5, columnspan=2)
 
         row = 4
-        self.ship_mortgage_frame = ShipMortgageFrame(self, self.router)
-        self.ship_mortgage_frame.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        ttk.Label(self, text="Ship").grid(row=row, column=0, sticky="w", padx=10, pady=0)
+        self.ship_combo = ttk.Combobox(self, state="readonly")
+        self.ship_combo["values"] = [p.name for p in self.ships]
         row = row + 1
-        
-
-
+        self.ship_combo.grid(row=row, column=0, padx=10, pady=5, sticky="w")
+        self.entries.append(self.ship_combo)
+        row = row + 1
+        if self.ship_mortgage.id is not None:
+            for i, ship in enumerate(self.ships):
+                if ship.id == self.ship_mortage.ship_id:
+                    self.ship_combo.current(i)
+                    break
 
     def populate_data_rates(self):
         for rate in self.rates:        
