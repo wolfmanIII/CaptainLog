@@ -12,7 +12,7 @@ class HomeView(ttk.Frame):
         self.create_widgets(master)
 
     def create_widgets(self, master):
-        master.columnconfigure(0, weight=1)
+        #master.columnconfigure(0, weight=1)
         self.img_captain_log_tk = EmojiCache(size=32).get("1f468-200d-1f680.png") # Astronaut
         self.captain_label = ttk.Label(self, text="Captain Log", font=("", 30), image=self.img_captain_log_tk, compound="left")
         self.captain_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
@@ -48,7 +48,7 @@ class ButtonGroup(ttk.Frame):
         self.img_annual_budget_tk = EmojiCache(size=16).get("1f4c9.png") #Chart decreasing 
         self.img_annual_budget_label = ttk.Button(
             self, text="Annual Budget", image=self.img_annual_budget_tk, compound="left",
-            command=lambda: parent.router.navigate("annual_budget")
+            command=lambda: parent.router.navigate("annual_budgets")
         )
         self.img_annual_budget_label.grid(column=3, row=1, padx=10, pady=10)
 
