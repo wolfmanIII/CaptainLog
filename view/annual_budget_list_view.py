@@ -14,7 +14,7 @@ class AnnualBudgetListView(ttk.Frame):
 
     def create_widgets(self):
         self.img_title_tk = EmojiCache(size=32).get("1f4c9.png") # Chart decreasing
-        self.title_label = ttk.Label(self, text="Annual Budget", font=("", 30), image=self.img_title_tk, compound="left")
+        self.title_label = ttk.Label(self, text="Annual Budgets", font=("", 30), image=self.img_title_tk, compound="left")
         self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, self.router)
