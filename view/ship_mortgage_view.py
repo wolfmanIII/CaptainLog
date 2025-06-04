@@ -2,8 +2,11 @@ from decimal import Decimal
 import locale
 import tkinter as tk
 from tkinter import ttk
+from tkinter.messagebox import showerror
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from sympy import true
+import ulid
 
 from model import ship_mortgage
 from model.ship import Ship
@@ -13,6 +16,7 @@ from service.dblink import DBLink
 from util.emoji_cache import EmojiCache
 from util.masked_numeric_entry import MaskedNumericEntry
 from util.ship_mortgage_plot import MutuoTravellerPlot
+from util.view_validator import ViewValidator
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
 
@@ -72,22 +76,27 @@ class ShipMortgageView(ttk.Frame):
         ttk.Label(self, text="Ship shares").grid(row=row, column=0, sticky="w", padx=5, pady=5)
         self.shares_entry = ttk.Spinbox(self, textvariable=self.vars["ship_shares"], width=5, from_=0, to=1000)
         self.shares_entry.grid(row=row+1, column=0, sticky="w", padx=5, pady=5)
+        self.entries.append(self.shares_entry)
 
         ttk.Label(self, text="Discount(%)").grid(row=row, column=1, sticky="w", padx=5, pady=5)
         self.discount_entry = ttk.Spinbox(self, textvariable=self.vars["discount"], width=5, from_=0, to=100)
         self.discount_entry.grid(row=row+1, column=1, sticky="w", padx=5, pady=5)
+        self.entries.append(self.discount_entry)
 
         ttk.Label(self, text="Advance payment(Cr)").grid(row=row, column=2, sticky="w", padx=5, pady=5)
         self.advance_entry = MaskedNumericEntry(self, textvariable=self.vars["advance_payment"], width=15, min_value=0, max_value=100_000_000_000)
         self.advance_entry.grid(row=row+1, column=2, sticky="w", padx=5, pady=5)
+        self.entries.append(self.advance_entry)
 
         ttk.Label(self, text="Start day").grid(row=row, column=3, sticky="w", padx=5, pady=5)
         self.day_entry = ttk.Spinbox(self, textvariable=self.vars["start_day"], width=5, from_=1, to=365)
         self.day_entry.grid(row=row+1, column=3, sticky="w", padx=5, pady=5)
+        self.entries.append(self.day_entry)
 
         ttk.Label(self, text="Start year").grid(row=row, column=4, sticky="w", padx=5, pady=5)
         self.year_entry = ttk.Spinbox(self, textvariable=self.vars["start_year"], width=5, from_=1105, to=2000)
         self.year_entry.grid(row=row+1, column=4, sticky="w", padx=5, pady=5)
+        self.entries.append(self.year_entry)
         # end Fields
 
         row = row + 2
@@ -167,7 +176,6 @@ class ShipMortgageView(ttk.Frame):
             self.ship_tree.insert('', 'end', iid=ship.id, text='Listbox', values=values)
 
     def calculate(self):
-
         # azzero l'unica riga del summary
         children = self.mortgage_tree.get_children()
         if children:
@@ -175,11 +183,17 @@ class ShipMortgageView(ttk.Frame):
             self.mortgage_tree.delete(primo_id)
 
         ship_cost = self.ship_cost()
+        if ship_cost <= 0:
+            return False
 
         selected_rate = self.rate_tree.selection()
-        rate_id = selected_rate[0]
-        rate = self.session.query(ShipMortageInterestRate).get(rate_id)
-
+        try:
+            rate_id = selected_rate[0]
+            rate = self.session.query(ShipMortageInterestRate).get(rate_id)
+        except IndexError:
+            showerror("Error", "Select a rate!")
+            return False
+        
         monthly_payment = (
             (ship_cost * rate.ship_price_multiplier) / rate.duration
         ) / 12
@@ -193,12 +207,14 @@ class ShipMortgageView(ttk.Frame):
             locale.format_string('%.2f', totale_mortage, grouping=True)
         )
         self.mortgage_tree.insert('', 'end', text='Listbox', values=values)
+        return True
 
     def ship_cost(self):
         try:
             selected_ship = self.ship_tree.selection()
             ship_id = selected_ship[0]
             ship = self.session.query(Ship).get(ship_id)
+            self.selected_ship = ship
             ship_cost = ship.ship_price
             if self.vars['ship_shares'].get() > 0:
                 ship_cost = ship_cost - (self.vars['ship_shares'].get() * 1000000)
@@ -212,21 +228,34 @@ class ShipMortgageView(ttk.Frame):
                 ship_cost = ship_cost - Decimal(advance_payment)
 
             return ship_cost
-        except Exception:
+        except IndexError:
+            showerror("Error", "Select a ship!")
             return 0
 
     def view_plot(self):
-        self.dialog = tk.Toplevel(self)
-        self.dialog.title("Ship mortgage chart")
-        data = {
-            "ship_cost": self.ship_cost(),
-            "rates": self.rates,
-        }
-        plot_view = PlotView(self.dialog, data)
-        plot_view.pack(fill="both", expand=True, padx=10, pady=10)
-        self.dialog.wait_visibility()
-        self.dialog.grab_set()
+        if self.ship_cost() > Decimal(0):
+            data = {
+                "ship_cost": self.ship_cost(),
+                "rates": self.rates,
+            }
+            self.dialog = tk.Toplevel(self)
+            self.dialog.title("Ship mortgage chart")
+            plot_view = PlotView(self.dialog, data)
+            plot_view.pack(fill="both", expand=True, padx=10, pady=10)
+            self.dialog.wait_visibility()
+            self.dialog.grab_set()
 
+
+    def save(self):
+        if ViewValidator(self.entries).is_valid():
+             if self.calculate():
+                self.ship_mortgage.code = ulid.new().str
+                self.ship_mortgage.name = self.selected_ship.name + "mortgage"
+                self.ship_mortgage.ship_shares = self.vars["ship_shares"].get()
+                self.ship_mortgage.discount = self.vars["discount"].get()
+                cleaned_advance_payment = self.vars["advance_payment"].replace(".", "").replace(",", ".")
+                self.ship_mortgage.advance_payment = cleaned_advance_payment
+            
 class ButtonGroup(ttk.Frame):
 
     def __init__(self, parent, router):
@@ -259,21 +288,3 @@ class PlotView(ttk.Frame):
         canvas = FigureCanvasTkAgg(fig, master=parent)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
-class ShipMortgageFrame(ttk.Frame):
-
-    def __init__(self, parent, router):
-        super().__init__(parent, borderwidth=1, relief="solid")
-        
-        row = 1
-        ttk.Label(self, text="Ship").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        self.ship_combo = ttk.Combobox(self, state="readonly")
-        self.ship_combo["values"] = [p.name for p in parent.ships]
-        self.ship_combo.grid(row=row, column=1, padx=10, pady=10)
-        parent.entries.append(self.ship_combo)
-        row = row + 1
-        if parent.ship_mortgage.id is not None:
-            for i, ship in enumerate(self.ships):
-                if ship.id == parent.ship_mortage.ship_id:
-                    self.ship_combo.current(i)
-                    break

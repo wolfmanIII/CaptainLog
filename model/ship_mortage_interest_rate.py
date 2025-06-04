@@ -9,6 +9,7 @@ from sqlalchemy import ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 
 from model.base import Base
+from model.ship_mortgage import ShipMortgage
 
 class ShipMortageInterestRate(Base):
 
@@ -19,6 +20,7 @@ class ShipMortageInterestRate(Base):
     ship_price_multiplier: Mapped[int] = mapped_column(Numeric(11, 2))
     ship_price_divider: Mapped[int] = mapped_column(Integer)
     annual_interest_rate: Mapped[float] = mapped_column(Numeric(11, 2))
+    ship_mortgage: Mapped["ShipMortgage"] = relationship(back_populates="rate")
 
 
 
