@@ -35,7 +35,7 @@ def add_rates():
         rate10 = ShipMortageInterestRate(
             duration = 10,
             ship_price_multiplier = 1.25,
-            ship_price_divider = 120,
+            ship_price_divider = 96,
             annual_interest_rate = 2.26
         )
         session.add(rate10)
