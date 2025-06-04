@@ -4,6 +4,7 @@ from tkinter import Tk, ttk
 
 from controller.router import Router
 from model.annual_budget import AnnualBudget
+from util.emoji_cache import EmojiCache
 from view.annual_budget_list_view import AnnualBudgetListView
 from view.contract_list_view import ContractListView
 from view.crew_list_view import CrewListView
@@ -19,8 +20,11 @@ class Application(ttk.Frame):
     def __init__(self, master: Tk):
         super().__init__(master)
         self.pack(fill="both", expand=True)
-        
 
+        self.img_footer_tk = EmojiCache(size=16).get("1f43a.png") # Back
+        footer = ttk.Label(master, text="Developed by Space Wolf", image=self.img_footer_tk, compound="right")
+        footer.pack(side="bottom", fill="x", padx=10, pady=10)
+        
         #Menubar(master)
         
         self.router = Router(self)
