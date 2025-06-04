@@ -69,7 +69,7 @@ class ShipMortgageView(ttk.Frame):
         row = row + 1
 
         buttonGroup = ButtonGroup(self, self.router)
-        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w", columnspan=5)
+        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew", columnspan=5)
         row = row + 1
 
         # Fields

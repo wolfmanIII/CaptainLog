@@ -26,7 +26,7 @@ class CrewListView(ttk.Frame):
         self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, self.router)
-        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
+        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew")
 
         vsb = ttk.Scrollbar(self, orient="vertical")
         vsb.grid(row=2, column=1, sticky="ns")

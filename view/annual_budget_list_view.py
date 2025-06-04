@@ -18,7 +18,7 @@ class AnnualBudgetListView(ttk.Frame):
         self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self, self.router)
-        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
+        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew")
 
 class ButtonGroup(ttk.Frame):
 

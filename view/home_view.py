@@ -18,7 +18,7 @@ class HomeView(ttk.Frame):
         self.captain_label.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         buttonGroup = ButtonGroup(self)
-        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="w")
+        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew")
 
 class ButtonGroup(ttk.Frame):
     def __init__(self, parent):
