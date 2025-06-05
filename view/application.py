@@ -22,8 +22,12 @@ class Application(ttk.Frame):
         self.pack(fill="both", expand=True)
 
         self.img_footer_tk = EmojiCache(size=16).get("1f43a.png") # Back
-        footer = ttk.Label(master, text="Developed by Space Wolf", image=self.img_footer_tk, compound="right")
-        footer.pack(side="bottom", fill="x", padx=10, pady=10)
+
+        footer_frame = ttk.Frame(master)
+        footer_frame.pack(side="bottom", fill="x", padx=10, pady=10)
+
+        footer = ttk.Label(footer_frame, text="Developed by Space Wolf", image=self.img_footer_tk, compound="right")
+        footer.pack(side="right", fill="x", padx=10, pady=10)
         
         #Menubar(master)
         
