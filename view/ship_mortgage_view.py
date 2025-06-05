@@ -75,11 +75,11 @@ class ShipMortgageView(ttk.Frame):
         row = 0
         self.img_title_tk = EmojiCache(size=32).get("1f4b8.png") # Money with wings
         self.title_label = ttk.Label(self, text="Ship Mortgage", font=("", 30), image=self.img_title_tk, compound="left")
-        self.title_label.grid(column=0, row=row, padx=10, pady=10, sticky="w", columnspan=5)
+        self.title_label.grid(column=0, row=row, padx=10, pady=10, sticky="w", columnspan=6)
         row = row + 1
 
         buttonGroup = ButtonGroup(self, self.router, self.readonly)
-        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew", columnspan=5)
+        buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew", columnspan=6)
         row = row + 1
 
         # Fields
@@ -113,11 +113,11 @@ class ShipMortgageView(ttk.Frame):
 
         self.img_ship_tk = EmojiCache(size=24).get("2708.png") # Airplane
         self.ship_label = ttk.Label(self, text="Ships", font=("", 18), image=self.img_ship_tk, compound="left")
-        self.ship_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=5)
+        self.ship_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
         vsb = ttk.Scrollbar(self, orient="vertical")
-        vsb.grid(row=row, column=1, sticky="ns")
+        vsb.grid(row=row, column=6, sticky="ns")
 
         ship_columns = ["code", "name", "type", "model", "price"]
         self.ship_tree = ttk.Treeview(self, columns=ship_columns, show="headings", yscrollcommand=vsb.set, height=5, selectmode="browse")
@@ -137,7 +137,7 @@ class ShipMortgageView(ttk.Frame):
 
         self.img_rate_tk = EmojiCache(size=24).get("1f4c8.png") # Chart increasing
         self.rate_label = ttk.Label(self, text="Annual interest rates", font=("", 18), image=self.img_rate_tk, compound="left")
-        self.rate_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=5)
+        self.rate_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
         rate_columns = ["Duration(years)", "Ship cost multiplier", "Mortgage payment divider(≈)", "Annual interest rate(%)"]
@@ -151,12 +151,12 @@ class ShipMortgageView(ttk.Frame):
         self.rate_tree.column('Annual interest rate(%)', anchor="e")
         self.rate_tree.column('Mortgage payment divider(≈)', anchor="e")
 
-        self.rate_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=5)
+        self.rate_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
         self.img_mortage_tk = EmojiCache(size=24).get("1f911.png") # Chart decreasing
         self.mortagage_label = ttk.Label(self, text="Ship mortgage summary", font=("", 18), image=self.img_mortage_tk, compound="left")
-        self.mortagage_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=5)
+        self.mortagage_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
         mortage_columns = ["Ship cost(Cr)", "Monthly payment(Cr)", "Annual payment(Cr)", "Total Mortagage(Cr)"]
@@ -168,7 +168,7 @@ class ShipMortgageView(ttk.Frame):
         self.mortgage_tree.column('Monthly payment(Cr)', anchor="e")
         self.mortgage_tree.column('Annual payment(Cr)', anchor="e")
         self.mortgage_tree.column('Total Mortagage(Cr)', anchor="e")
-        self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=5)
+        self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
     def populate_data(self):
