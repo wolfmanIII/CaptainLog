@@ -27,3 +27,11 @@ Traveller Captain Log
 ### pillow
 
 [pip install pillow](https://pypi.org/project/pillow/)
+
+### matplotlib
+
+[python -m pip install -U matplotlib](https://pypi.org/project/matplotlib/)
+
+### pandas
+
+[pip install pandas](https://pypi.org/project/pandas/)

@@ -14,7 +14,7 @@ from model.ship_mortgage import ShipMortgage
 from service.dblink import DBLink
 from util.emoji_cache import EmojiCache
 from util.masked_numeric_entry import MaskedNumericEntry
-from util.ship_mortgage_plot import MutuoTravellerPlot
+from util.ship_mortgage_plot import ShipMortgagePlot
 from util.view_validator import ViewValidator
 
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF-8')
@@ -351,7 +351,7 @@ class PlotView(ttk.Frame):
     def __init__(self, parent, data):
         super().__init__(parent, relief="solid")
 
-        plotter = MutuoTravellerPlot(
+        plotter = ShipMortgagePlot(
             principal=data["ship_cost"],
             durations = [rate.duration for rate in data["rates"]],
             multipliers=[rate.ship_price_multiplier for rate in data["rates"]]

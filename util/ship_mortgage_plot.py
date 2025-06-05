@@ -3,7 +3,7 @@ import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-class MutuoTravellerPlot:
+class ShipMortgagePlot:
     def __init__(self, principal, durations, multipliers):
         self.principal = Decimal(principal)
         self.durations = durations
