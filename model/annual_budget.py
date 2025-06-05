@@ -21,3 +21,6 @@ class AnnualBudget(Base):
     end_year: Mapped[int] = mapped_column(Integer)
     ship_mortgage_id: Mapped[int] = mapped_column(ForeignKey("ship_mortgage.id"))
     ship_mortgage: Mapped["ShipMortgage"] = relationship(back_populates="annual_budgets")
+    ship_maintenance: Mapped[int] = mapped_column(Integer)
+    mortgage_sanctions: Mapped[int] = mapped_column(Integer)
+    mortgage_payments: Mapped[int] = mapped_column(Integer)

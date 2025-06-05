@@ -1,6 +1,3 @@
-from re import split
-from numpy import size
-from sqlalchemy import null
 import ulid
 import tkinter as tk
 from tkinter import ttk

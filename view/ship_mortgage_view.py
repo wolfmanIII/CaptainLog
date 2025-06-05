@@ -140,7 +140,7 @@ class ShipMortgageView(ttk.Frame):
         self.rate_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        rate_columns = ["Duration(years)", "Ship cost multiplier", "Mortgage payment divider(≈)", "Annual interest rate(%)"]
+        rate_columns = ["Duration(years)", "Ship cost multiplier", "Ship cost divider(≈)", "Annual interest rate(%)"]
         self.rate_tree = ttk.Treeview(self, columns=rate_columns, show="headings", height=4, selectmode="browse")
         for column in rate_columns:
             text_show = column
@@ -149,7 +149,7 @@ class ShipMortgageView(ttk.Frame):
         self.rate_tree.column('Duration(years)', anchor="e")
         self.rate_tree.column('Ship cost multiplier', anchor="e")
         self.rate_tree.column('Annual interest rate(%)', anchor="e")
-        self.rate_tree.column('Mortgage payment divider(≈)', anchor="e")
+        self.rate_tree.column('Ship cost divider(≈)', anchor="e")
 
         self.rate_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
@@ -159,7 +159,7 @@ class ShipMortgageView(ttk.Frame):
         self.mortagage_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        mortage_columns = ["Ship cost(Cr)", "Monthly payment(Cr)", "Annual payment(Cr)", "Total Mortagage(Cr)"]
+        mortage_columns = ["Ship cost(Cr)", "Monthly payment(Cr)", "Annual payment(Cr)", "Total refund(Cr)"]
         self.mortgage_tree = ttk.Treeview(self, columns=mortage_columns, show="headings", height=1, selectmode="browse")
         for column in mortage_columns:
             text_show = column
@@ -167,7 +167,7 @@ class ShipMortgageView(ttk.Frame):
         self.mortgage_tree.column('Ship cost(Cr)', anchor="e")
         self.mortgage_tree.column('Monthly payment(Cr)', anchor="e")
         self.mortgage_tree.column('Annual payment(Cr)', anchor="e")
-        self.mortgage_tree.column('Total Mortagage(Cr)', anchor="e")
+        self.mortgage_tree.column('Total refund(Cr)', anchor="e")
         self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
@@ -270,7 +270,7 @@ class ShipMortgageView(ttk.Frame):
         if ViewValidator(self.entries).is_valid():
              if self.calculate():
                 self.ship_mortgage.code = ulid.new().str
-                self.ship_mortgage.name = self.selected_ship.name + "mortgage"
+                self.ship_mortgage.name = self.selected_ship.name + " mortgage"
                 self.ship_mortgage.ship_shares = self.vars["ship_shares"].get()
                 self.ship_mortgage.discount = self.vars["discount"].get()
                 cleaned_advance_payment = self.vars["advance_payment"].get().replace(".", "").replace(",", ".")
@@ -306,7 +306,7 @@ class ShipMortgageView(ttk.Frame):
         if self.readonly:
             for entry in self.entries:
                 try:
-                    entry.config(state="disabled")
+                    entry.configure(state="disabled")
                 except Exception as e:
                     print(f"Errore disabilitando {entry}: {e}")
             
@@ -319,17 +319,17 @@ class ButtonGroup(ttk.Frame):
         self.home_button = ttk.Button(self, text="Back", command=lambda: router.navigate("home"), image=self.img_back_tk, compound="left")
         self.home_button.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
+        self.img_graph_tk = EmojiCache(size=16).get("1f4c9.png") # Chart decreasing
+        self.graph_button = ttk.Button(self, text="Chart", image=self.img_graph_tk, compound="left", command=lambda: parent.view_plot())
+        self.graph_button.grid(column=1, row=0, padx=10, pady=10, sticky="w")
+
         self.img_calculate_tk = EmojiCache(size=16).get("2699.png") # Back
         self.calculate_button = ttk.Button(
             self, text="Calculate", image=self.img_calculate_tk,
             state="disabled" if readonly else "normal",
             compound="left", command=lambda: parent.calculate()
         )
-        self.calculate_button.grid(column=1, row=0, padx=10, pady=10, sticky="w")
-
-        self.img_graph_tk = EmojiCache(size=16).get("1f4c9.png") # Chart decreasing
-        self.graph_button = ttk.Button(self, text="Chart", image=self.img_graph_tk, compound="left", command=lambda: parent.view_plot())
-        self.graph_button.grid(column=2, row=0, padx=10, pady=10, sticky="w")
+        self.calculate_button.grid(column=2, row=0, padx=10, pady=10, sticky="w")
 
         self.img_save_tk = EmojiCache(size=16).get("1f4be.png") # Save
         self.save_button = ttk.Button(
