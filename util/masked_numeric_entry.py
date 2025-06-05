@@ -67,6 +67,9 @@ class MaskedNumericEntry(ttk.Frame):
             return float(raw)
         except ValueError:
             return None
+        
+    def config(self, **kwargs):
+        self.entry.config(**kwargs)
 
 
 class FloatingTooltipError(tk.Toplevel):

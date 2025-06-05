@@ -5,7 +5,6 @@ from tkinter import ttk
 from tkinter.messagebox import showerror
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-from sympy import true
 import ulid
 
 from model import ship_mortgage
@@ -29,6 +28,12 @@ class ShipMortgageView(ttk.Frame):
         self.rates = self.session.query(ShipMortageInterestRate).order_by(ShipMortageInterestRate.duration.desc()).all()
         self.ships = self.session.query(Ship).order_by(Ship.name).all()
 
+        self.lock_selection = False
+        self.last_selected_rate = None
+        self.last_selected_ship = None
+
+        self.readonly = False
+
         try:
             self.ship_mortgage = self.session.query(ShipMortgage).one()
         except Exception:
@@ -43,6 +48,7 @@ class ShipMortgageView(ttk.Frame):
         }
 
         if self.ship_mortgage.id is not None:
+            self.readonly = True
             self.vars["ship_shares"].set(self.ship_mortgage.ship_shares)
             self.vars["discount"].set(self.ship_mortgage.discount)
             formatted_advance_payment = f"{self.ship_mortgage.advance_payment:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
@@ -58,7 +64,11 @@ class ShipMortgageView(ttk.Frame):
 
         self.entries = []
         self.create_widgets()
+        self.lock_entries()
+        self.lock_treeviews()
         self.populate_data()
+        if self.readonly:
+            self.calculate()
 
 
     def create_widgets(self):
@@ -68,7 +78,7 @@ class ShipMortgageView(ttk.Frame):
         self.title_label.grid(column=0, row=row, padx=10, pady=10, sticky="w", columnspan=5)
         row = row + 1
 
-        buttonGroup = ButtonGroup(self, self.router)
+        buttonGroup = ButtonGroup(self, self.router, self.readonly)
         buttonGroup.grid(column=0, row=1, padx=5, pady=5, sticky="nsew", columnspan=5)
         row = row + 1
 
@@ -170,10 +180,19 @@ class ShipMortgageView(ttk.Frame):
                 locale.format_string('%.2f', rate.annual_interest_rate, grouping=True)
             )
             self.rate_tree.insert('', 'end', iid=rate.id, text='Listbox', values=values)
+
+            if self.ship_mortgage.id is not None:
+                if rate.id == self.ship_mortgage.rate_id:
+                    self.rate_tree.selection_set(self.ship_mortgage.rate_id)
+        
         
         for ship in self.ships:
             values = (ship.code, ship.name, ship.type, ship.model, locale.format_string('%.2f', ship.ship_price, grouping=True))
             self.ship_tree.insert('', 'end', iid=ship.id, text='Listbox', values=values)
+
+            if self.ship_mortgage.id is not None:
+                if ship.id == self.ship_mortgage.ship_id:
+                    self.ship_tree.selection_set(self.ship_mortgage.ship_id)
 
     def calculate(self):
         # azzero l'unica riga del summary
@@ -190,6 +209,7 @@ class ShipMortgageView(ttk.Frame):
         try:
             rate_id = selected_rate[0]
             rate = self.session.query(ShipMortageInterestRate).get(rate_id)
+            self.selected_rate = rate
         except IndexError:
             showerror("Error", "Select a rate!")
             return False
@@ -253,12 +273,46 @@ class ShipMortgageView(ttk.Frame):
                 self.ship_mortgage.name = self.selected_ship.name + "mortgage"
                 self.ship_mortgage.ship_shares = self.vars["ship_shares"].get()
                 self.ship_mortgage.discount = self.vars["discount"].get()
-                cleaned_advance_payment = self.vars["advance_payment"].replace(".", "").replace(",", ".")
+                cleaned_advance_payment = self.vars["advance_payment"].get().replace(".", "").replace(",", ".")
                 self.ship_mortgage.advance_payment = cleaned_advance_payment
+                self.ship_mortgage.rate_id = self.selected_rate.id
+                self.ship_mortgage.ship_id = self.selected_ship.id
+                self.ship_mortgage.start_day = self.vars["start_day"].get()
+                self.ship_mortgage.start_year = self.vars["start_year"].get()
+                self.session.add(self.ship_mortgage)
+                self.session.commit()
+                self.router.navigate("ship_mortgage")
+    
+    def delete(self):
+        self.session.delete(self.ship_mortgage)
+        self.session.commit()
+        self.router.navigate("ship_mortgage")
+
+    def lock_treeviews(self):
+        if self.readonly:
+            def block_event(event):
+                return "break"
+            # Blocca selezione con click
+            self.ship_tree.bind("<Button-1>", block_event)
+            self.rate_tree.bind("<Button-1>", block_event)
+            self.mortgage_tree.bind("<Button-1>", block_event)
+
+            # Blocca selezione con tastiera
+            self.ship_tree.bind("<Key>", block_event)
+            self.rate_tree.bind("<Key>", block_event)
+            self.mortgage_tree.bind("<Key>", block_event)
+
+    def lock_entries(self):
+        if self.readonly:
+            for entry in self.entries:
+                try:
+                    entry.config(state="disabled")
+                except Exception as e:
+                    print(f"Errore disabilitando {entry}: {e}")
             
 class ButtonGroup(ttk.Frame):
 
-    def __init__(self, parent, router):
+    def __init__(self, parent, router, readonly=False):
         super().__init__(parent, borderwidth=1, relief="solid")
 
         self.img_back_tk = EmojiCache(size=16).get("2b05.png") # Back
@@ -266,12 +320,32 @@ class ButtonGroup(ttk.Frame):
         self.home_button.grid(column=0, row=0, padx=10, pady=10, sticky="w")
 
         self.img_calculate_tk = EmojiCache(size=16).get("2699.png") # Back
-        self.calculate_button = ttk.Button(self, text="Calculate", image=self.img_calculate_tk, compound="left", command=lambda: parent.calculate())
+        self.calculate_button = ttk.Button(
+            self, text="Calculate", image=self.img_calculate_tk,
+            state="disabled" if readonly else "normal",
+            compound="left", command=lambda: parent.calculate()
+        )
         self.calculate_button.grid(column=1, row=0, padx=10, pady=10, sticky="w")
 
         self.img_graph_tk = EmojiCache(size=16).get("1f4c9.png") # Chart decreasing
         self.graph_button = ttk.Button(self, text="Chart", image=self.img_graph_tk, compound="left", command=lambda: parent.view_plot())
         self.graph_button.grid(column=2, row=0, padx=10, pady=10, sticky="w")
+
+        self.img_save_tk = EmojiCache(size=16).get("1f4be.png") # Save
+        self.save_button = ttk.Button(
+            self, text="Save", image=self.img_save_tk, compound="left",
+            state="disabled" if readonly else "normal",
+            command=lambda: parent.save()
+        )
+        self.save_button.grid(column=3, row=0, padx=10, pady=10, sticky="w")
+
+        self.img_delete_tk = EmojiCache(size=16).get("1f6ae.png") # Trash
+        self.delete_button = ttk.Button(
+            self, text="Delete", image=self.img_delete_tk, compound="left",
+            state="disabled" if not readonly else "normal",
+            command=lambda: parent.delete()
+        )
+        self.delete_button.grid(column=4, row=0, padx=10, pady=10, sticky="w")
 
 class PlotView(ttk.Frame):
     def __init__(self, parent, data):
