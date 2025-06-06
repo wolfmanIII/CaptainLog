@@ -99,7 +99,7 @@ class ShipMortgageView(ttk.Frame):
         self.entries.append(self.shares_entry)
 
         ttk.Label(self, text="Discount(%)").grid(row=row, column=1, sticky="w", padx=5, pady=5)
-        self.discount_entry = ttk.Spinbox(self, textvariable=self.vars["discount"], width=5, from_=0, to=100)
+        self.discount_entry = ttk.Spinbox(self, textvariable=self.vars["discount"], width=6, from_=0, to=100)
         self.discount_entry.grid(row=row+1, column=1, sticky="w", padx=5, pady=5)
         self.entries.append(self.discount_entry)
 
@@ -126,11 +126,14 @@ class ShipMortgageView(ttk.Frame):
         self.ship_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        vsb = ttk.Scrollbar(self, orient="vertical")
-        vsb.grid(row=row, column=4, sticky="ns", padx=10)
+        ### Ship Frame
+        ship_frame = ttk.Frame(self)
+        ship_frame.grid(column=0, row=row, sticky="w", columnspan=6)
+        vsb = ttk.Scrollbar(ship_frame, orient="vertical")
+        vsb.grid(row=0, column=1, sticky="ns")
 
         ship_columns = ["code", "name", "type", "model", "price"]
-        self.ship_tree = ttk.Treeview(self, columns=ship_columns, show="headings", yscrollcommand=vsb.set, height=5, selectmode="browse")
+        self.ship_tree = ttk.Treeview(ship_frame, columns=ship_columns, show="headings", yscrollcommand=vsb.set, height=5, selectmode="browse")
         vsb.config(command=self.ship_tree.yview)
         for column in ship_columns:
             text_show= ""
@@ -141,9 +144,9 @@ class ShipMortgageView(ttk.Frame):
             self.ship_tree.heading(column, text=text_show)
 
         self.ship_tree.column('price', anchor="e")
-        self.ship_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
+        self.ship_tree.grid(column=0, row=0, padx=5, pady=5, sticky="w")
+        ###
         row = row + 1
-
 
         self.img_rate_tk = EmojiCache(size=24).get("1f4c8.png") # Chart increasing
         self.rate_label = ttk.Label(self, text="Annual interest rates", font=("", 18), image=self.img_rate_tk, compound="left")
@@ -184,7 +187,7 @@ class ShipMortgageView(ttk.Frame):
         self.mortagage_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        mortage_columns = ["Ship cost(Cr)", "Monthly fee(Cr)", "Annual fee(Cr)", "Total mortgage(Cr)", "Monthly fee + insurance(Cr)", "Annual insurance(Cr)"]
+        mortage_columns = ["Ship cost(Cr)", "Monthly fee(Cr)", "Annual fee(Cr)", "Total mortgage(Cr)"]
         self.mortgage_tree = ttk.Treeview(self, columns=mortage_columns, show="headings", height=1, selectmode="browse")
         for column in mortage_columns:
             text_show = column
@@ -193,10 +196,23 @@ class ShipMortgageView(ttk.Frame):
         self.mortgage_tree.column('Monthly fee(Cr)', anchor="e")
         self.mortgage_tree.column('Annual fee(Cr)', anchor="e")
         self.mortgage_tree.column('Total mortgage(Cr)', anchor="e")
-        self.mortgage_tree.column('Monthly fee + insurance(Cr)', anchor="e")
-        self.mortgage_tree.column('Annual insurance(Cr)', anchor="e")
         self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
+
+        self.img_insurance_summary_tk = EmojiCache(size=24).get("1f911.png") # Chart decreasing
+        self.insurance_summary_label = ttk.Label(self, text="Insurance summary", font=("", 18), image=self.img_insurance_summary_tk, compound="left")
+        self.insurance_summary_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
+        row = row + 1
+
+        insurance_summary_columns = ["Monthly (mortgage + insurance)(Cr)", "Monthly insurance(Cr)", "Annual insurance(Cr)"]
+        self.insurance_summary_tree = ttk.Treeview(self, columns=insurance_summary_columns, show="headings", height=1, selectmode="browse")
+        for column in insurance_summary_columns:
+            text_show = column
+            self.insurance_summary_tree.heading(column, text=text_show)
+        self.insurance_summary_tree.column('Monthly (mortgage + insurance)(Cr)', anchor="e")
+        self.insurance_summary_tree.column('Monthly insurance(Cr)', anchor="e")
+        self.insurance_summary_tree.column('Annual insurance(Cr)', anchor="e")
+        self.insurance_summary_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
 
     def populate_data(self):
         for rate in self.rates:        
@@ -230,13 +246,18 @@ class ShipMortgageView(ttk.Frame):
 
     def calculate(self):
         # azzero l'unica riga del summary
-        children = self.mortgage_tree.get_children()
-        if children:
-            primo_id = children[0]
+        children_mortgage = self.mortgage_tree.get_children()
+        if children_mortgage:
+            primo_id = children_mortgage[0]
             self.mortgage_tree.delete(primo_id)
 
+        children_insurance = self.insurance_summary_tree.get_children()
+        if children_insurance:
+            primo_id = children_insurance[0]
+            self.insurance_summary_tree.delete(primo_id)
+
         ship_cost = self.ship_cost()
-        if ship_cost <= 0:
+        if ship_cost < 0:
             return False
 
         selected_rate = self.rate_tree.selection()
@@ -253,19 +274,26 @@ class ShipMortgageView(ttk.Frame):
         ) / 12
         annual_payment = monthly_payment * 12
 
-        monthly_payment_insurance = monthly_payment + self.insurance_cost()
-        annual_insurance = self.insurance_cost() * 12
+        monthly_insurance = self.insurance_cost()
+        monthly_payment_insurance = monthly_payment + monthly_insurance
+        annual_insurance = monthly_insurance * 12
         total_mortage = ship_cost * rate.ship_price_multiplier
 
-        values = (
+        mortgage_values = (
             locale.format_string('%.2f', float(ship_cost), grouping=True),
             locale.format_string('%.2f', float(monthly_payment), grouping=True),
             locale.format_string('%.2f', float(annual_payment), grouping=True),
             locale.format_string('%.2f', float(total_mortage), grouping=True),
+        )
+
+        insurance_values = (
             locale.format_string('%.2f', float(monthly_payment_insurance), grouping=True),
+            locale.format_string('%.2f', float(monthly_insurance), grouping=True),
             locale.format_string('%.2f', float(annual_insurance), grouping=True)
         )
-        self.mortgage_tree.insert('', 'end', text='Listbox', values=values)
+
+        self.mortgage_tree.insert('', 'end', text='Listbox', values=mortgage_values)
+        self.insurance_summary_tree.insert('', 'end', text='Listbox', values=insurance_values)
         return True
     
     def insurance_cost(self):
@@ -347,12 +375,14 @@ class ShipMortgageView(ttk.Frame):
             self.rate_tree.bind("<Button-1>", block_event)
             self.mortgage_tree.bind("<Button-1>", block_event)
             self.insurance_tree.bind("<Button-1>", block_event)
+            self.insurance_summary_tree.bind("<Button-1>", block_event)
 
             # Blocca selezione con tastiera
             self.ship_tree.bind("<Key>", block_event)
             self.rate_tree.bind("<Key>", block_event)
             self.mortgage_tree.bind("<Key>", block_event)
             self.insurance_tree.bind("<Key>", block_event)
+            self.insurance_summary_tree.bind("<Key>", block_event)
             self.insurance_checkbox.config(state="disabled")
 
     def lock_entries(self):
