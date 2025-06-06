@@ -1,13 +1,17 @@
 from decimal import Decimal
 import locale
+from pydoc import text
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import showerror
+from tkinter.messagebox import showerror, showinfo
+from warnings import showwarning
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import ulid
 
 from model import ship_mortgage
+from model import insurance
+from model.insurance import Insurance
 from model.ship import Ship
 from model.ship_mortage_interest_rate import ShipMortageInterestRate
 from model.ship_mortgage import ShipMortgage
@@ -27,10 +31,12 @@ class ShipMortgageView(ttk.Frame):
         self.session = DBLink().getSession()
         self.rates = self.session.query(ShipMortageInterestRate).order_by(ShipMortageInterestRate.duration.desc()).all()
         self.ships = self.session.query(Ship).order_by(Ship.name).all()
+        self.insurances = self.session.query(Insurance).order_by(Insurance.annual_cost).all()
 
         self.lock_selection = False
         self.last_selected_rate = None
         self.last_selected_ship = None
+        self.last_selected_insurance = None
 
         self.readonly = False
 
@@ -45,6 +51,7 @@ class ShipMortgageView(ttk.Frame):
             "advance_payment": tk.StringVar(),
             "start_day": tk.IntVar(),
             "start_year": tk.IntVar(),
+            "insurance_check": tk.IntVar()
         }
 
         if self.ship_mortgage.id is not None:
@@ -55,18 +62,21 @@ class ShipMortgageView(ttk.Frame):
             self.vars["advance_payment"].set(formatted_advance_payment)
             self.vars["start_day"].set(self.ship_mortgage.start_day)
             self.vars["start_year"].set(self.ship_mortgage.start_year)
+            self.vars["insurance_check"].set(1 if self.ship_mortgage.insurance_id is not None else 0)
         else:
             self.vars["ship_shares"].set(0)
             self.vars["discount"].set(0)
             self.vars["advance_payment"].set("0")
             self.vars["start_day"].set(2)
             self.vars["start_year"].set(1105)
+            self.vars["insurance_check"].set(0)
 
         self.entries = []
         self.create_widgets()
         self.lock_entries()
-        self.lock_treeviews()
         self.populate_data()
+        self.on_insurance_check_toggle()
+        self.lock_treeviews()
         if self.readonly:
             self.calculate()
 
@@ -137,10 +147,17 @@ class ShipMortgageView(ttk.Frame):
 
         self.img_rate_tk = EmojiCache(size=24).get("1f4c8.png") # Chart increasing
         self.rate_label = ttk.Label(self, text="Annual interest rates", font=("", 18), image=self.img_rate_tk, compound="left")
-        self.rate_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
+        self.rate_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=3)
+
+        self.insurance_checkbox = ttk.Checkbutton(self, text="Insurance", variable=self.vars["insurance_check"], command=lambda: self.on_insurance_check_toggle())
+        self.insurance_checkbox.grid(column=3, row=row, padx=5, pady=5, sticky="w")
+
+        self.img_coverage_tk = EmojiCache(size=16).get("1f6df.png") # Ring buoy
+        self.coverage_button = ttk.Button(self, text="Coverage", image=self.img_coverage_tk, compound="left", command=lambda: self.insurance_coverage_view())
+        self.coverage_button.grid(column=4, row=row, padx=10, pady=10, sticky="w")
         row = row + 1
 
-        rate_columns = ["Duration(years)", "Ship cost multiplier", "Ship cost divider(≈)", "Annual interest rate(%)"]
+        rate_columns = ["Duration(years)", "Ship cost multiplier", "Annual interest rate(%)"]
         self.rate_tree = ttk.Treeview(self, columns=rate_columns, show="headings", height=4, selectmode="browse")
         for column in rate_columns:
             text_show = column
@@ -149,9 +166,17 @@ class ShipMortgageView(ttk.Frame):
         self.rate_tree.column('Duration(years)', anchor="e")
         self.rate_tree.column('Ship cost multiplier', anchor="e")
         self.rate_tree.column('Annual interest rate(%)', anchor="e")
-        self.rate_tree.column('Ship cost divider(≈)', anchor="e")
 
-        self.rate_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
+        self.rate_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=3)
+
+        insurance_columns = ["Type", "Annual cost(% ship price)"]
+        self.insurance_tree = ttk.Treeview(self, columns=insurance_columns, show="headings", height=4, selectmode="browse")
+        for column in insurance_columns:
+            text_show = column
+            self.insurance_tree.heading(column, text=text_show)
+
+        self.insurance_tree.column('Annual cost(% ship price)', anchor="e")
+        self.insurance_tree.grid(column=3, row=row, padx=5, pady=5, sticky="w", columnspan=3)
         row = row + 1
 
         self.img_mortage_tk = EmojiCache(size=24).get("1f911.png") # Chart decreasing
@@ -159,14 +184,14 @@ class ShipMortgageView(ttk.Frame):
         self.mortagage_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        mortage_columns = ["Ship cost(Cr)", "Monthly payment(Cr)", "Annual payment(Cr)", "Total refund(Cr)"]
+        mortage_columns = ["Ship cost(Cr)", "Monthly pay(Cr)", "Monthly pay + insurance(Cr)", "Total refund(Cr)"]
         self.mortgage_tree = ttk.Treeview(self, columns=mortage_columns, show="headings", height=1, selectmode="browse")
         for column in mortage_columns:
             text_show = column
             self.mortgage_tree.heading(column, text=text_show)
         self.mortgage_tree.column('Ship cost(Cr)', anchor="e")
-        self.mortgage_tree.column('Monthly payment(Cr)', anchor="e")
-        self.mortgage_tree.column('Annual payment(Cr)', anchor="e")
+        self.mortgage_tree.column('Monthly pay(Cr)', anchor="e")
+        self.mortgage_tree.column('Monthly pay + insurance(Cr)', anchor="e")
         self.mortgage_tree.column('Total refund(Cr)', anchor="e")
         self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
@@ -194,6 +219,14 @@ class ShipMortgageView(ttk.Frame):
                 if ship.id == self.ship_mortgage.ship_id:
                     self.ship_tree.selection_set(self.ship_mortgage.ship_id)
 
+        for insurance in self.insurances:
+            values = (insurance.name, locale.format_string('%.2f', insurance.annual_cost, grouping=True))
+            self.insurance_tree.insert('', 'end', iid=insurance.id, text='Listbox', values=values)
+
+            if self.ship_mortgage.id is not None:
+                if insurance.id == self.ship_mortgage.insurance_id:
+                    self.insurance_tree.selection_set(self.ship_mortgage.insurance_id)
+
     def calculate(self):
         # azzero l'unica riga del summary
         children = self.mortgage_tree.get_children()
@@ -217,17 +250,30 @@ class ShipMortgageView(ttk.Frame):
         monthly_payment = (
             (ship_cost * rate.ship_price_multiplier) / rate.duration
         ) / 12
+
+        monthly_payment_insurance = monthly_payment + self.insurance_cost()
         annual_payment = monthly_payment * 12
         totale_mortage = ship_cost * rate.ship_price_multiplier
 
         values = (
-            locale.format_string('%.2f', ship_cost, grouping=True),
-            locale.format_string('%.2f', monthly_payment, grouping=True),
-            locale.format_string('%.2f', annual_payment, grouping=True),
-            locale.format_string('%.2f', totale_mortage, grouping=True)
+            locale.format_string('%.2f', float(ship_cost), grouping=True),
+            locale.format_string('%.2f', float(monthly_payment), grouping=True),
+            locale.format_string('%.2f', float(monthly_payment_insurance), grouping=True),
+            locale.format_string('%.2f', float(totale_mortage), grouping=True)
         )
         self.mortgage_tree.insert('', 'end', text='Listbox', values=values)
         return True
+    
+    def insurance_cost(self):
+        try:
+            selected_insurance = self.insurance_tree.selection()
+            insurance_id = selected_insurance[0]
+            insurance = self.session.query(Insurance).get(insurance_id)
+            self.selected_insurance = insurance
+            insurance_cost = self.selected_ship.ship_price / 100 * insurance.annual_cost / 12
+            return insurance_cost
+        except IndexError:
+            return 0
 
     def ship_cost(self):
         try:
@@ -265,7 +311,6 @@ class ShipMortgageView(ttk.Frame):
             self.dialog.wait_visibility()
             self.dialog.grab_set()
 
-
     def save(self):
         if ViewValidator(self.entries).is_valid():
              if self.calculate():
@@ -277,6 +322,7 @@ class ShipMortgageView(ttk.Frame):
                 self.ship_mortgage.advance_payment = cleaned_advance_payment
                 self.ship_mortgage.rate_id = self.selected_rate.id
                 self.ship_mortgage.ship_id = self.selected_ship.id
+                self.ship_mortgage.insurance_id = self.selected_insurance.id
                 self.ship_mortgage.start_day = self.vars["start_day"].get()
                 self.ship_mortgage.start_year = self.vars["start_year"].get()
                 self.session.add(self.ship_mortgage)
@@ -296,11 +342,14 @@ class ShipMortgageView(ttk.Frame):
             self.ship_tree.bind("<Button-1>", block_event)
             self.rate_tree.bind("<Button-1>", block_event)
             self.mortgage_tree.bind("<Button-1>", block_event)
+            self.insurance_tree.bind("<Button-1>", block_event)
 
             # Blocca selezione con tastiera
             self.ship_tree.bind("<Key>", block_event)
             self.rate_tree.bind("<Key>", block_event)
             self.mortgage_tree.bind("<Key>", block_event)
+            self.insurance_tree.bind("<Key>", block_event)
+            self.insurance_checkbox.config(state="disabled")
 
     def lock_entries(self):
         if self.readonly:
@@ -309,6 +358,74 @@ class ShipMortgageView(ttk.Frame):
                     entry.configure(state="disabled")
                 except Exception as e:
                     print(f"Errore disabilitando {entry}: {e}")
+
+    def insurance_coverage_view(self):
+        selected_items = self.insurance_tree.selection()
+        if len(selected_items) <= 0:
+            showerror("Error", "Select an insurance!")
+            return
+
+        self.dialog = tk.Toplevel(self)
+        self.dialog.title("Insurance coverage")
+        ship_view = InsuranceCoverageView(self.dialog, self.router, selected_items[0])
+        ship_view.pack(fill="both", expand=True, padx=10, pady=10)
+        self.dialog.wait_visibility()
+        self.dialog.grab_set()
+
+    def on_insurance_check_toggle(self):
+        def block_event(event):
+            return "break"
+        stato = self.vars["insurance_check"].get()
+        if stato == 1:
+            self.insurance_tree.unbind("<Button-1>")
+            self.insurance_tree.unbind("<Key>")
+            self.coverage_button.config(state="enabled")
+        else:
+            self.insurance_tree.bind("<Button-1>", block_event)
+            self.insurance_tree.bind("<Key>", block_event)
+            self.insurance_tree.selection_remove(self.insurance_tree.selection())
+            self.coverage_button.config(state="disabled")
+
+class InsuranceCoverageView(ttk.Frame):
+    def __init__(self, master, router, id):
+        super().__init__(master)
+        self.parent = master
+        self.router = router
+        self.session = DBLink().getSession()
+        self.insurance = self.session.get(Insurance, id)
+
+        self.img_coverage_tk = EmojiCache(size=16).get("1f6df.png") # Ring buoy
+        self.title_label = ttk.Label(self, text="Insurance coverage", font=("", 18), image=self.img_coverage_tk, compound="left")
+        self.title_label.grid(column=0, row=0, padx=5, pady=10)
+
+        name_label = ttk.Label(self, text=self.insurance.name, font=("", 14))
+        name_label.grid(column=0, row=1, padx=5, pady=10, sticky="w")
+
+        row = 2
+        index = 1
+        for coverage in self.insurance.coverage:
+            covarage_label = ttk.Label(self, text=str(index) + ". " + coverage)
+            covarage_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+            index = index + 1
+            row = row + 1
+
+        name_label = ttk.Label(self, text="Common exclusions (all levels)", font=("", 14))
+        name_label.grid(column=0, row=row, padx=5, pady=10, sticky="w")
+        row = row + 1
+
+        exclusion_1_label = ttk.Label(self, text="1. Intentional acts or negligence (drunk pilot, uncontrolled jumps)")
+        exclusion_1_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        row = row + 1
+
+        exclusion_2_label = ttk.Label(self, text="2. Undeclared Illegal Missions")
+        exclusion_2_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        row = row + 1
+
+        exclusion_2_label = ttk.Label(self, text="3. Unapproved modifications to the ship")
+        exclusion_2_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        row = row + 1
+        
+    
             
 class ButtonGroup(ttk.Frame):
 

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from fixture.ship_role import add_ship_roles
 from fixture.ship import add_ships
 from fixture.ship_mortage_interest_rate import add_rates
+from fixture.insurance import add_insurances
 import sys
 
 
@@ -22,6 +23,8 @@ def run(type):
             add_ships()
         case "ship_mortgage_interest_rate":
             add_rates()
+        case "insurance":
+            add_insurances()
 
 type = sys.argv[1]
 run(type)

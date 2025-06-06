@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 
 from model.base import Base
 if TYPE_CHECKING:
-    from model import Ship, AnnualBudget, ShipMortageInterestRate
+    from model import Ship, AnnualBudget, ShipMortageInterestRate, Insurance
 
 class ShipMortgage(Base):
     __tablename__ = "ship_mortgage"
@@ -27,3 +27,5 @@ class ShipMortgage(Base):
     advance_payment: Mapped[float] = mapped_column(Numeric(11, 2), nullable=True)
     discount: Mapped[float] = mapped_column(Numeric(11, 2), nullable=True)
     annual_budgets: Mapped[List["AnnualBudget"]] = relationship(back_populates="ship_mortgage")
+    insurance_id: Mapped[int] = mapped_column(ForeignKey(name="fk_insurance_id", column="insurance.id"), nullable=True)
+    insurance: Mapped["Insurance"] = relationship(back_populates="ship_mortgage", single_parent=True)
