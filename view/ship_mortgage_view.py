@@ -73,9 +73,9 @@ class ShipMortgageView(ttk.Frame):
 
         self.entries = []
         self.create_widgets()
-        self.lock_entries()
         self.populate_data()
         self.on_insurance_check_toggle()
+        self.lock_entries()
         self.lock_treeviews()
         if self.readonly:
             self.calculate()
@@ -184,15 +184,17 @@ class ShipMortgageView(ttk.Frame):
         self.mortagage_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        mortage_columns = ["Ship cost(Cr)", "Monthly pay(Cr)", "Monthly pay + insurance(Cr)", "Total refund(Cr)"]
+        mortage_columns = ["Ship cost(Cr)", "Monthly fee(Cr)", "Annual fee(Cr)", "Total mortgage(Cr)", "Monthly fee + insurance(Cr)", "Annual insurance(Cr)"]
         self.mortgage_tree = ttk.Treeview(self, columns=mortage_columns, show="headings", height=1, selectmode="browse")
         for column in mortage_columns:
             text_show = column
             self.mortgage_tree.heading(column, text=text_show)
         self.mortgage_tree.column('Ship cost(Cr)', anchor="e")
-        self.mortgage_tree.column('Monthly pay(Cr)', anchor="e")
-        self.mortgage_tree.column('Monthly pay + insurance(Cr)', anchor="e")
-        self.mortgage_tree.column('Total refund(Cr)', anchor="e")
+        self.mortgage_tree.column('Monthly fee(Cr)', anchor="e")
+        self.mortgage_tree.column('Annual fee(Cr)', anchor="e")
+        self.mortgage_tree.column('Total mortgage(Cr)', anchor="e")
+        self.mortgage_tree.column('Monthly fee + insurance(Cr)', anchor="e")
+        self.mortgage_tree.column('Annual insurance(Cr)', anchor="e")
         self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
@@ -250,16 +252,19 @@ class ShipMortgageView(ttk.Frame):
         monthly_payment = (
             (ship_cost * rate.ship_price_multiplier) / rate.duration
         ) / 12
+        annual_payment = monthly_payment * 12
 
         monthly_payment_insurance = monthly_payment + self.insurance_cost()
-        annual_payment = monthly_payment * 12
-        totale_mortage = ship_cost * rate.ship_price_multiplier
+        annual_insurance = self.insurance_cost() * 12
+        total_mortage = ship_cost * rate.ship_price_multiplier
 
         values = (
             locale.format_string('%.2f', float(ship_cost), grouping=True),
             locale.format_string('%.2f', float(monthly_payment), grouping=True),
+            locale.format_string('%.2f', float(annual_payment), grouping=True),
+            locale.format_string('%.2f', float(total_mortage), grouping=True),
             locale.format_string('%.2f', float(monthly_payment_insurance), grouping=True),
-            locale.format_string('%.2f', float(totale_mortage), grouping=True)
+            locale.format_string('%.2f', float(annual_insurance), grouping=True)
         )
         self.mortgage_tree.insert('', 'end', text='Listbox', values=values)
         return True
@@ -360,14 +365,9 @@ class ShipMortgageView(ttk.Frame):
                     print(f"Errore disabilitando {entry}: {e}")
 
     def insurance_coverage_view(self):
-        selected_items = self.insurance_tree.selection()
-        if len(selected_items) <= 0:
-            showerror("Error", "Select an insurance!")
-            return
-
         self.dialog = tk.Toplevel(self)
         self.dialog.title("Insurance coverage")
-        ship_view = InsuranceCoverageView(self.dialog, self.router, selected_items[0])
+        ship_view = InsuranceCoverageView(self.dialog, self.router, self.insurances)
         ship_view.pack(fill="both", expand=True, padx=10, pady=10)
         self.dialog.wait_visibility()
         self.dialog.grab_set()
@@ -379,50 +379,57 @@ class ShipMortgageView(ttk.Frame):
         if stato == 1:
             self.insurance_tree.unbind("<Button-1>")
             self.insurance_tree.unbind("<Key>")
-            self.coverage_button.config(state="enabled")
         else:
             self.insurance_tree.bind("<Button-1>", block_event)
             self.insurance_tree.bind("<Key>", block_event)
             self.insurance_tree.selection_remove(self.insurance_tree.selection())
-            self.coverage_button.config(state="disabled")
 
 class InsuranceCoverageView(ttk.Frame):
-    def __init__(self, master, router, id):
+    def __init__(self, master, router, insurances):
         super().__init__(master)
         self.parent = master
         self.router = router
-        self.session = DBLink().getSession()
-        self.insurance = self.session.get(Insurance, id)
 
         self.img_coverage_tk = EmojiCache(size=16).get("1f6df.png") # Ring buoy
         self.title_label = ttk.Label(self, text="Insurance coverage", font=("", 18), image=self.img_coverage_tk, compound="left")
-        self.title_label.grid(column=0, row=0, padx=5, pady=10)
+        self.title_label.grid(column=0, row=0, padx=10, pady=10, columnspan=3)
 
-        name_label = ttk.Label(self, text=self.insurance.name, font=("", 14))
-        name_label.grid(column=0, row=1, padx=5, pady=10, sticky="w")
+        column_img_vars = {
+            0: "1f7e2.png",
+            1: "2b50.png",
+            2: "1f31f.png"
+        }
 
-        row = 2
-        index = 1
-        for coverage in self.insurance.coverage:
-            covarage_label = ttk.Label(self, text=str(index) + ". " + coverage)
-            covarage_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
-            index = index + 1
-            row = row + 1
+        column = 0
+        for insurance in insurances:
+            img_tk = EmojiCache(size=24).get(column_img_vars[column]) # Chart decreasing
+            name_label = ttk.Label(self, text=insurance.name, font=("", 14), image=img_tk, compound="left")
+            name_label.grid(column=column, row=1, padx=5, pady=10, sticky="w")
+            index = 1
+            row = 2
+            for coverage in insurance.coverage:
+                covarage_label = ttk.Label(self, text=str(index) + ". " + coverage)
+                covarage_label.grid(column=column, row=row, padx=10, pady=5, sticky="w")
+                index = index + 1
+                row = row + 1
+            column = column + 1
 
-        name_label = ttk.Label(self, text="Common exclusions (all levels)", font=("", 14))
-        name_label.grid(column=0, row=row, padx=5, pady=10, sticky="w")
+        
+        img_name_tk = EmojiCache(size=24).get("26d4.png") # Chart decreasing
+        name_label = ttk.Label(self, text="Common exclusions (all levels)", font=("", 14), image=img_name_tk, compound="left")
+        name_label.grid(column=0, row=row, padx=10, pady=10, sticky="w", columnspan=3)
         row = row + 1
 
         exclusion_1_label = ttk.Label(self, text="1. Intentional acts or negligence (drunk pilot, uncontrolled jumps)")
-        exclusion_1_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        exclusion_1_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=3)
         row = row + 1
 
         exclusion_2_label = ttk.Label(self, text="2. Undeclared Illegal Missions")
-        exclusion_2_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        exclusion_2_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=3)
         row = row + 1
 
         exclusion_2_label = ttk.Label(self, text="3. Unapproved modifications to the ship")
-        exclusion_2_label.grid(column=0, row=row, padx=5, pady=5, sticky="w")
+        exclusion_2_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=3)
         row = row + 1
         
     
