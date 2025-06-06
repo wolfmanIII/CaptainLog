@@ -127,7 +127,7 @@ class ShipMortgageView(ttk.Frame):
         row = row + 1
 
         vsb = ttk.Scrollbar(self, orient="vertical")
-        vsb.grid(row=row, column=6, sticky="ns")
+        vsb.grid(row=row, column=4, sticky="ns")
 
         ship_columns = ["code", "name", "type", "model", "price"]
         self.ship_tree = ttk.Treeview(self, columns=ship_columns, show="headings", yscrollcommand=vsb.set, height=5, selectmode="browse")
@@ -141,7 +141,7 @@ class ShipMortgageView(ttk.Frame):
             self.ship_tree.heading(column, text=text_show)
 
         self.ship_tree.column('price', anchor="e")
-        self.ship_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=5)
+        self.ship_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
 
@@ -203,7 +203,6 @@ class ShipMortgageView(ttk.Frame):
             values = (
                 rate.duration,
                 locale.format_string('%.2f', rate.ship_price_multiplier, grouping=True),
-                rate.ship_price_divider,
                 locale.format_string('%.2f', rate.annual_interest_rate, grouping=True)
             )
             self.rate_tree.insert('', 'end', iid=rate.id, text='Listbox', values=values)
