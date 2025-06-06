@@ -34,9 +34,7 @@ class ShipMortgageView(ttk.Frame):
         self.insurances = self.session.query(Insurance).order_by(Insurance.annual_cost).all()
 
         self.lock_selection = False
-        self.last_selected_rate = None
-        self.last_selected_ship = None
-        self.last_selected_insurance = None
+        self.selected_insurance = None
 
         self.readonly = False
 
@@ -199,7 +197,7 @@ class ShipMortgageView(ttk.Frame):
         self.mortgage_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        self.img_insurance_summary_tk = EmojiCache(size=24).get("1f911.png") # Chart decreasing
+        self.img_insurance_summary_tk = EmojiCache(size=24).get("1f6e1.png") # Shield
         self.insurance_summary_label = ttk.Label(self, text="Insurance summary", font=("", 18), image=self.img_insurance_summary_tk, compound="left")
         self.insurance_summary_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
@@ -354,7 +352,8 @@ class ShipMortgageView(ttk.Frame):
                 self.ship_mortgage.advance_payment = cleaned_advance_payment
                 self.ship_mortgage.rate_id = self.selected_rate.id
                 self.ship_mortgage.ship_id = self.selected_ship.id
-                self.ship_mortgage.insurance_id = self.selected_insurance.id
+                if self.selected_insurance is not None:
+                    self.ship_mortgage.insurance_id = self.selected_insurance.id
                 self.ship_mortgage.start_day = self.vars["start_day"].get()
                 self.ship_mortgage.start_year = self.vars["start_year"].get()
                 self.session.add(self.ship_mortgage)
