@@ -460,8 +460,6 @@ class InsuranceCoverageView(ttk.Frame):
         exclusion_2_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=3)
         row = row + 1
         
-    
-            
 class ButtonGroup(ttk.Frame):
 
     def __init__(self, parent, router, readonly=False):
