@@ -30,7 +30,7 @@ class ShipListView(ttk.Frame):
         vsb = ttk.Scrollbar(self, orient="vertical")
         vsb.grid(row=2, column=1, sticky="ns")
 
-        columns = ["code", "name", "type", "model", "price"]
+        columns = ["code", "name", "type", "class", "price"]
         self.ship_tree = ttk.Treeview(self, columns=columns, show="headings", yscrollcommand=vsb.set, height=10)
         vsb.config(command=self.ship_tree.yview)
         for column in columns:

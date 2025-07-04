@@ -45,7 +45,7 @@ class ShipView(ttk.Frame):
             "code": "Code",
             "name": "Name",
             "type": "Type",
-            "model": "Model",
+            "model": "Class",
             "ship_price": "Price(Cr)"
         }
 
@@ -63,7 +63,7 @@ class ShipView(ttk.Frame):
             ttk.Label(self, text=self.columns["code"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
             self.code_entry = ttk.Entry(self, textvariable=self.vars["code"], width=40)
             self.code_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
-            self.code_entry.configure(state="readonly")
+            self.code_entry.configure(state="disabled")
             self.entries.append(self.code_entry)
             row = row + 1
         
