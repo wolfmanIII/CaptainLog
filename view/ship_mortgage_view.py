@@ -130,7 +130,7 @@ class ShipMortgageView(ttk.Frame):
         vsb = ttk.Scrollbar(ship_frame, orient="vertical")
         vsb.grid(row=0, column=1, sticky="ns")
 
-        ship_columns = ["code", "name", "type", "model", "price"]
+        ship_columns = ["code", "name", "type", "class", "price"]
         self.ship_tree = ttk.Treeview(ship_frame, columns=ship_columns, show="headings", yscrollcommand=vsb.set, height=5, selectmode="browse")
         vsb.config(command=self.ship_tree.yview)
         for column in ship_columns:
