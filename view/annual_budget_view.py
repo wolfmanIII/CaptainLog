@@ -4,13 +4,12 @@ from tkinter import IntVar, ttk
 import tkinter.font as tkFont
 
 from model.annual_budget import AnnualBudget
-from model.crew import Crew
 from model.ship_mortgage import ShipMortgage
 from service.dblink import DBLink
 from util.emoji_cache import EmojiCache
 from util.view_validator import ViewValidator
 
-class CrewView(ttk.Frame):
+class AnnualBudgetView(ttk.Frame):
     def __init__(self, master, router, id=None):
         super().__init__(master)
         self.parent = master
@@ -50,7 +49,7 @@ class CrewView(ttk.Frame):
             "end_day": "End day",
             "end_year": "End year",
             "ship_mortgage_id": "Ship mortgage",
-            "mortgage_sanctions": "Ship ortgage sanctions",
+            "mortgage_sanctions": "Ship mortgage sanctions",
             "mortgage_payments": "Ship mortgage payments",
         }
 
@@ -63,7 +62,7 @@ class CrewView(ttk.Frame):
         self.title_label.grid(column=0, row=0, padx=10, pady=10, sticky="we", columnspan=2)
 
         row = 1
-        if self.crew.id is not None:
+        if self.annual_budget.id is not None:
             ttk.Label(self, text=self.columns["code"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
             self.code_entry = ttk.Entry(self, textvariable=self.vars["code"], width=40)
             self.code_entry.grid(row=row, column=1, sticky="we", padx=5, pady=5)
@@ -73,10 +72,10 @@ class CrewView(ttk.Frame):
 
         ttk.Label(self, text=self.columns["ship_mortgage_id"]).grid(row=row, column=0, sticky="e", padx=5, pady=5)
         self.mortgage_combo = ttk.Combobox(self, state="readonly")
-        self.mortgage_combo["values"] = [p.name for p in self.ships]
+        self.mortgage_combo["values"] = [p.name for p in self.mortgages]
         self.mortgage_combo.grid(row=row, column=1, sticky="we", padx=5, pady=5)
         row = row + 1
-        self.entries.append(self.ship_combo)
+        self.entries.append(self.mortgage_combo)
         if self.annual_budget.id is not None:
             for i, mortgage in enumerate(self.mortgages):
                 if mortgage.id == self.annual_budget.ship_mortgage_id:
