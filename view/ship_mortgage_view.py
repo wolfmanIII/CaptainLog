@@ -202,15 +202,29 @@ class ShipMortgageView(ttk.Frame):
         self.insurance_summary_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
         row = row + 1
 
-        insurance_summary_columns = ["Monthly (mortgage + insurance)(Cr)", "Monthly insurance(Cr)", "Annual insurance(Cr)"]
+        insurance_summary_columns = ["Monthly fee(Cr)", "Annual fee(Cr)"]
         self.insurance_summary_tree = ttk.Treeview(self, columns=insurance_summary_columns, show="headings", height=1, selectmode="browse")
         for column in insurance_summary_columns:
             text_show = column
             self.insurance_summary_tree.heading(column, text=text_show)
-        self.insurance_summary_tree.column('Monthly (mortgage + insurance)(Cr)', anchor="e")
-        self.insurance_summary_tree.column('Monthly insurance(Cr)', anchor="e")
-        self.insurance_summary_tree.column('Annual insurance(Cr)', anchor="e")
+        self.insurance_summary_tree.column('Monthly fee(Cr)', anchor="e")
+        self.insurance_summary_tree.column('Annual fee(Cr)', anchor="e")
         self.insurance_summary_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
+        row = row + 1
+
+        self.img_total_summary_tk = EmojiCache(size=24).get("1f6e1.png") # Shield
+        self.total_summary_label = ttk.Label(self, text="Mortage + Insurance", font=("", 18), image=self.img_total_summary_tk, compound="left")
+        self.total_summary_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
+        row = row + 1
+
+        total_summary_columns = ["Monthly fee(Cr)", "Annual fee(Cr)"]
+        self.total_summary_tree = ttk.Treeview(self, columns=total_summary_columns, show="headings", height=1, selectmode="browse")
+        for column in total_summary_columns:
+            text_show = column
+            self.total_summary_tree.heading(column, text=text_show)
+        self.total_summary_tree.column('Monthly fee(Cr)', anchor="e")
+        self.total_summary_tree.column('Annual fee(Cr)', anchor="e")
+        self.total_summary_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
 
     def populate_data(self):
         for rate in self.rates:        
@@ -254,6 +268,11 @@ class ShipMortgageView(ttk.Frame):
             primo_id = children_insurance[0]
             self.insurance_summary_tree.delete(primo_id)
 
+        children_total = self.total_summary_tree.get_children()
+        if children_total:
+            primo_id = children_total[0]
+            self.total_summary_tree.delete(primo_id)
+
         ship_cost = self.ship_cost()
         if ship_cost < 0:
             return False
@@ -273,9 +292,11 @@ class ShipMortgageView(ttk.Frame):
         annual_payment = monthly_payment * 12
 
         monthly_insurance = self.insurance_cost()
-        monthly_payment_insurance = monthly_payment + monthly_insurance
         annual_insurance = monthly_insurance * 12
         total_mortage = ship_cost * rate.ship_price_multiplier
+
+        monthly_total = monthly_insurance + monthly_payment
+        annual_total = annual_insurance + annual_payment
 
         mortgage_values = (
             locale.format_string('%.2f', float(ship_cost), grouping=True),
@@ -285,13 +306,18 @@ class ShipMortgageView(ttk.Frame):
         )
 
         insurance_values = (
-            locale.format_string('%.2f', float(monthly_payment_insurance), grouping=True),
             locale.format_string('%.2f', float(monthly_insurance), grouping=True),
             locale.format_string('%.2f', float(annual_insurance), grouping=True)
         )
 
+        total_values = (
+            locale.format_string('%.2f', float(monthly_total), grouping=True),
+            locale.format_string('%.2f', float(annual_total), grouping=True)
+        )
+
         self.mortgage_tree.insert('', 'end', text='Listbox', values=mortgage_values)
         self.insurance_summary_tree.insert('', 'end', text='Listbox', values=insurance_values)
+        self.total_summary_tree.insert('', 'end', text='Listbox', values=total_values)
         return True
     
     def insurance_cost(self):
