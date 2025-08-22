@@ -94,12 +94,12 @@ class AnnualBudgetView(ttk.Frame):
             data["ship_mortgage_id"] = self.mortgages[index].id if index != -1 else None
 
             for k, v in data.items():
-                setattr(self.crew, k, v)
+                setattr(self.annual_budget, k, v)
 
             if self.annual_budget.id is None:
                 self.annual_budget.code = ulid.new().str
                 self.session.add(self.annual_budget)
 
             self.session.commit()
-            self.router.get_view("crew").refresh()
+            self.router.get_view("annual_budget").refresh()
             self.parent.destroy()

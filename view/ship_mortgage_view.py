@@ -146,6 +146,7 @@ class ShipMortgageView(ttk.Frame):
         ###
         row = row + 1
 
+
         self.img_rate_tk = EmojiCache(size=24).get("1f4c8.png") # Chart increasing
         self.rate_label = ttk.Label(self, text="Annual interest rates", font=("", 18), image=self.img_rate_tk, compound="left")
         self.rate_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=3)
@@ -200,6 +201,11 @@ class ShipMortgageView(ttk.Frame):
         self.img_insurance_summary_tk = EmojiCache(size=24).get("1f6e1.png") # Shield
         self.insurance_summary_label = ttk.Label(self, text="Insurance summary", font=("", 18), image=self.img_insurance_summary_tk, compound="left")
         self.insurance_summary_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
+
+        self.img_total_summary_tk = EmojiCache(size=24).get("1f9ee.png") # Abacus
+        self.total_summary_label = ttk.Label(self, text="Mortage + Insurance", font=("", 18), image=self.img_total_summary_tk, compound="left")
+        self.total_summary_label.grid(column=3, row=row, padx=10, pady=5, sticky="w", columnspan=6)
+
         row = row + 1
 
         insurance_summary_columns = ["Monthly fee(Cr)", "Annual fee(Cr)"]
@@ -210,12 +216,7 @@ class ShipMortgageView(ttk.Frame):
         self.insurance_summary_tree.column('Monthly fee(Cr)', anchor="e")
         self.insurance_summary_tree.column('Annual fee(Cr)', anchor="e")
         self.insurance_summary_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
-        row = row + 1
 
-        self.img_total_summary_tk = EmojiCache(size=24).get("1f6e1.png") # Shield
-        self.total_summary_label = ttk.Label(self, text="Mortage + Insurance", font=("", 18), image=self.img_total_summary_tk, compound="left")
-        self.total_summary_label.grid(column=0, row=row, padx=10, pady=5, sticky="w", columnspan=6)
-        row = row + 1
 
         total_summary_columns = ["Monthly fee(Cr)", "Annual fee(Cr)"]
         self.total_summary_tree = ttk.Treeview(self, columns=total_summary_columns, show="headings", height=1, selectmode="browse")
@@ -224,7 +225,7 @@ class ShipMortgageView(ttk.Frame):
             self.total_summary_tree.heading(column, text=text_show)
         self.total_summary_tree.column('Monthly fee(Cr)', anchor="e")
         self.total_summary_tree.column('Annual fee(Cr)', anchor="e")
-        self.total_summary_tree.grid(column=0, row=row, padx=5, pady=5, sticky="w", columnspan=6)
+        self.total_summary_tree.grid(column=3, row=row, padx=5, pady=5, sticky="w", columnspan=6)
 
     def populate_data(self):
         for rate in self.rates:        
@@ -507,9 +508,9 @@ class ButtonGroup(ttk.Frame):
         )
         self.calculate_button.grid(column=2, row=0, padx=10, pady=10, sticky="w")
 
-        self.img_save_tk = EmojiCache(size=16).get("1f4be.png") # Save
+        self.img_save_tk = EmojiCache(size=16).get("2712.png") # Pen
         self.save_button = ttk.Button(
-            self, text="Save", image=self.img_save_tk, compound="left",
+            self, text="Sign", image=self.img_save_tk, compound="left",
             state="disabled" if readonly else "normal",
             command=lambda: parent.save()
         )
